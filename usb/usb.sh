@@ -1,4 +1,4 @@
-device=$(sudo fdisk -l | grep -o '^/dev/sd[a-z][0-9]') # identify /dev/sda1 as the USB device
+device=$(sudo fdisk -l | grep -o '^/dev/sd[a-z][0-9]') # identify /dev/sda1 or so as the USB device
 echo -e "Device: ${device} \n"
 
 echo -e "Mount device"
