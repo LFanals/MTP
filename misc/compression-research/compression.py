@@ -2,7 +2,7 @@ from typing import Tuple
 import zlib
 from texttable import Texttable
 
-files = ["large.txt", "short.txt"]
+files = ["test_150_lines.txt"]
 
 def main():
     results = []
@@ -21,6 +21,11 @@ def main():
         # Compress file line by line
         lsize, compressed_lines = compress_by_line(text)
         lsize = lsize / 1000
+
+        # Save compressed file 
+        f = open('compressed', 'wb')
+        f.write(compressed)
+        f.close()
 
         # Decompress 
         text = decompress([compressed])
