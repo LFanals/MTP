@@ -37,8 +37,14 @@ def main():
     # Creating data frames
     rts_chunk_list = packet_creator.create_data_frames(chunk_list)
     print("Number of chunks: " + str(len(rts_chunk_list)))
+    subchunk_amount = len(rts_chunk_list[3])
     print("Number of subchunks per chunk: " + str(len(rts_chunk_list[3])))
     print("    " + packet_creator.dump(rts_chunk_list[3][2]))
+
+
+    ############################################################################
+    ###########################  Test Communication  ###########################
+    ############################################################################
 
     # Starting TEST simple sender
     print("Python NRF24 Simple Sender Example.")
@@ -76,9 +82,13 @@ def main():
 
     try:
         print(f'Send to {address}')
-        count = 0
-        while True:
-            payload = hello_frame
+        i = 0
+        payload = hello_frame
+        while i < subchunk_amount + 2:
+
+            if (i == 0): payload = hello_frame
+            elif (i == 1): payload = chunk_info_frame
+            else: payload = rts_chunk_list[0][i-2]
 
             # Send the payload to the address specified above.
             nrf.reset_packages_lost()
