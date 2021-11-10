@@ -108,8 +108,8 @@ def main():
             else:
                 print(f"Error: lost={nrf.get_packages_lost()}, retries={nrf.get_retries()}")
 
-            # Wait 10 seconds before sending the next reading.
-            time.sleep(10)
+            time.sleep(0.1)
+        i += 1
     except:
         traceback.print_exc()
         nrf.power_down()
