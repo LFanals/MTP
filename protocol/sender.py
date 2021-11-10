@@ -88,9 +88,15 @@ def main():
         payload = hello_frame
         while i < subchunk_amount + 2:
 
-            if (i == 0): payload = hello_frame
-            elif (i == 1): payload = chunk_info_frame
-            else: payload = rts_chunk_list[0][i-2]
+            if (i == 0): 
+                payload = hello_frame
+                print("Sending hello_frame")
+            elif (i == 1): 
+                payload = chunk_info_frame
+                print("Sending chunk_info_frame")
+            else: 
+                payload = rts_chunk_list[0][i-2]
+                print("Sending data_frame")
 
             # Send the payload to the address specified above.
             nrf.reset_packages_lost()
@@ -108,8 +114,9 @@ def main():
             else:
                 print(f"Error: lost={nrf.get_packages_lost()}, retries={nrf.get_retries()}")
 
+            i += 1
             time.sleep(0.1)
-        i += 1
+        
     except:
         traceback.print_exc()
         nrf.power_down()
