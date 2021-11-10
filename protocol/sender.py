@@ -29,10 +29,12 @@ def main():
     # Creating hello frame
     hello_frame = packet_creator.create_hello_frame(chunk_amount)
     print("    " + packet_creator.dump(hello_frame))
+    print("    length: " + str(len(hello_frame)))
 
     # Creating chunk_info frame
     chunk_info_frame = packet_creator.create_chunk_info_frame(106, 3)
     print("    " + packet_creator.dump(chunk_info_frame))
+    print("    length: " + str(len(chunk_info_frame)))
     
     # Creating data frames
     rts_chunk_list = packet_creator.create_data_frames(chunk_list)

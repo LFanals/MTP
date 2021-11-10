@@ -25,7 +25,7 @@ def zero_padd_list(list, N):
 def create_hello_frame(chunk_amount):
     print("Creating Hello Frame")
     frame = [HELLO_PREFIX, chunk_amount]
-    frame = zero_padd_list(frame, PAYLOAD_SIZE)
+    frame = zero_padd_list(frame, SUBCHUNK_SIZE)
     frame = bytearray(frame)
     return frame
 
@@ -33,7 +33,7 @@ def create_hello_frame(chunk_amount):
 def create_chunk_info_frame(subchunk_amount, chunk_id):
     print("Creating Chunk Info Frame")
     frame = [CHUNK_INFO_PREFIX, subchunk_amount, chunk_id]
-    frame = zero_padd_list(frame, PAYLOAD_SIZE)
+    frame = zero_padd_list(frame, SUBCHUNK_SIZE)
     frame = bytearray(frame)
     return frame
 
@@ -57,7 +57,7 @@ def create_data_frames(chunk_list):
             subchunk = bytearray(DATA_PREFIX) + subchunk_list[i]
 
             # 0 padding if necessary
-            subchunk = zero_padd_list(subchunk, PAYLOAD_SIZE)
+            subchunk = zero_padd_list(subchunk, SUBCHUNK_SIZE)
 
             # Create list of all the subchunks (in bytes)
             rts_subchunk_list.append(subchunk)
