@@ -1,5 +1,4 @@
 from typing import List
-import nrf24
 import os
 import math
 import sys
