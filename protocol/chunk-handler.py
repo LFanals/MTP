@@ -49,11 +49,23 @@ def compress_chunk(chunk: str) -> bytearray:
     chunk_bin = str.encode(chunk)
     return bytearray(zlib.compress(chunk_bin))
 
+def decompress_chunk(compressed: bytearray) -> str:
+    chunk = zlib.decompress(bytes(compressed))
+    return chunk.decode()
+
+def decompress_chunks(compressed_chunks: List[bytearray]) -> List[str]:
+    chunks = list()
+    for compressed_chunk in compressed_chunks:
+           chunks.append(decompress_chunk(compressed_chunk))
+    return chunks
+
 def main():
     # For testing purposes
-    chunks = get_file_chunks("large_entire.txt", 10)
-    print("Number of compressed chunks: " + str(len(chunks)))
+    compressed_chunks = get_file_chunks("large_entire.txt", 10)
+    print("Number of compressed chunks: " + str(len(compressed_chunks)))
+    chunks = decompress_chunks(compressed_chunks)
+    print("Number of decompressed chunks: " + str(len(chunks)))
+    print(chunks[2])
 
 if __name__ == "__main__":
     main()
-
