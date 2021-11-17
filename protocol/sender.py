@@ -78,6 +78,7 @@ def main():
     nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.DYNAMIC, channel=100, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.LOW)
     nrf.set_address_bytes(len(address))
     nrf.open_writing_pipe(address)
+    nrf.set_retransmission(1, 1024)
     
     # Display the content of NRF24L01 device registers.
     nrf.show_registers()
