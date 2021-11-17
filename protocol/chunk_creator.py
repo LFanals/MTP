@@ -2,7 +2,6 @@ from typing import List
 import math
 import zlib
 
-
 def get_file_chunks(filename: str, chunk_size: int) -> List[bytearray]: 
     # Given a filename and the size of the chunks (number of lines) returns a list of the compressed chunks as bytearrays
     print("Creating chunks of size: " + str(chunk_size))
@@ -13,14 +12,19 @@ def get_file_chunks(filename: str, chunk_size: int) -> List[bytearray]:
 
 def read_file(filename: str) -> str:
     # Opens and reads the specified file with encoding UTF-16. Returns the text of the file as string
-    file = open(filename, "r", encoding="UTF-16")
+    file = open(filename, "rb")
     text = file.read()
     file.close()
     return text
 
 def divide_file(file: str, N: int) -> List[str]:
     # Gets the complete file as a string and divides it by the number of lines specified
-    lines = file.split("\n")
+
+    # print(file)
+    n = math.ceil(len(file)/20)
+    lines = [str(file[i:i+n]) for i in range(0, len(file), n)]
+    # print(lines)
+
     chunks = list()
     print("Number of lines: " + str(len(lines)))
 
