@@ -5,7 +5,7 @@ import zlib
 
 def get_file_chunks(filename: str, chunk_size: int) -> List[bytearray]: 
     # Given a filename and the size of the chunks (number of lines) returns a list of the compressed chunks as bytearrays
-    print("Creating chunks of size: " + str(chunk_size))
+    print("Getting file " + filename + " chunks")
     file = read_file(filename)
     chunks = divide_file(file, chunk_size)
     return compress_chunks(chunks)
