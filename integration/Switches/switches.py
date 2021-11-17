@@ -27,11 +27,11 @@ SW5 = 5
 
 # Initialize states
 # iSWx and iiSWx act as two chained registers. rSWx changes state if iSWx==iiSWx
-rSW1, iSW1, iiSW1 = 0, 0
-rSW2, iSW2, iiSW2 = 0, 0
-rSW3, iSW3, iiSW3 = 0, 0
-rSW4, iSW4, iiSW4 = 0, 0
-rSW5, iSW5, iiSW5 = 0, 0
+rSW1, iSW1, iiSW1 = 0, 0, 0
+rSW2, iSW2, iiSW2 = 0, 0, 0
+rSW3, iSW3, iiSW3 = 0, 0, 0
+rSW4, iSW4, iiSW4 = 0, 0, 0
+rSW5, iSW5, iiSW5 = 0, 0, 0
 
 
 def config():
