@@ -18,7 +18,7 @@ def main():
         print("son loop") 
         parent.control_led(2, True)
 
-        if (read_master_sw() = False): # Master switch goes to 0
+        if (read_master_sw() == False): # Master switch goes to 0
             print("Son execution finished")
 
         sleep(0.1)  
