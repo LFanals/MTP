@@ -78,7 +78,7 @@ def main():
     nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.DYNAMIC, channel=100, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.LOW)
     nrf.set_address_bytes(len(address))
     nrf.open_writing_pipe(address)
-    nrf.set_retransmission(1, 1024)
+ 
     
     # Display the content of NRF24L01 device registers.
     nrf.show_registers()
@@ -112,10 +112,13 @@ def main():
             
             if nrf.get_packages_lost() == 0:
                 print(f"Success: lost={nrf.get_packages_lost()}, retries={nrf.get_retries()}")
+                i += 1
             else:
                 print(f"Error: lost={nrf.get_packages_lost()}, retries={nrf.get_retries()}")
+                print("RESENDING PAYLOAD")
+                time.sleep(0.2)
 
-            i += 1
+            
             time.sleep(0.1)
         
     except:

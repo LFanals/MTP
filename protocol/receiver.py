@@ -46,7 +46,7 @@ if __name__ == "__main__":
     nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.DYNAMIC, channel=100, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.MIN)
     nrf.set_address_bytes(len(address))
 
-    nrf.set_retransmission(1, 1024)
+    # nrf.set_retransmission(1, 1024)
 
     # Listen on the address specified as parameter
     nrf.open_reading_pipe(RF24_RX_ADDR.P1, address)
