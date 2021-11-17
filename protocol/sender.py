@@ -101,6 +101,7 @@ def main():
 
             # Send the payload to the address specified above.
             nrf.reset_packages_lost()
+            attempts = 0
             nrf.send(payload)
             try:
                 nrf.wait_until_sent()
@@ -115,7 +116,8 @@ def main():
                 i += 1
             else:
                 print(f"Error: lost={nrf.get_packages_lost()}, retries={nrf.get_retries()}")
-                print("RESENDING PAYLOAD")
+                attempts += 1
+                print("** Resending Payload. Retry count: " + str(15*attempts))
                 time.sleep(0.2)
 
             
