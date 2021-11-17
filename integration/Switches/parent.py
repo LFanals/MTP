@@ -83,6 +83,8 @@ def read_switches():
     if (iSW4 == iiSW4): rSW4 = iSW4
     if (iSW5 == iiSW5): rSW5 = iSW5
  
+    print("Read switches")
+
 
 def main():
     config()

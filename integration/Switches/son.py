@@ -10,10 +10,13 @@ import RPi.GPIO as GPIO
 import time
 from time import sleep
 
+import parent
+
 
 def main():
     while True:
         print("son loop") 
+        parent.read_switches()
         sleep(0.1)  
 
 
