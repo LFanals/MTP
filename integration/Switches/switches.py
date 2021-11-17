@@ -59,7 +59,7 @@ def config():
     GPIO.setup(SW4, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     GPIO.setup(SW5, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
      
-    print("Configure IO")    
+    print("Configured IO")    
 
 
 def main():
