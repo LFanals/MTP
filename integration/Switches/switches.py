@@ -40,7 +40,11 @@ GPIO.setup(SW4, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(SW5, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 # Initialize states
-iSW1, iSW2, iSW3, iSW4, iSW5 = 0
+iSW1 = 0
+iSW2 = 0
+iSW3 = 0
+iSW4 = 0
+iSW5 = 0
 
 
 # Loop
