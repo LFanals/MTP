@@ -83,6 +83,8 @@ def main():
     # Display the content of NRF24L01 device registers.
     nrf.show_registers()
 
+    retryAttempts = 0
+
     try:
         print(f'Send to {address}')
         i = 0
@@ -101,7 +103,6 @@ def main():
 
             # Send the payload to the address specified above.
             nrf.reset_packages_lost()
-            attempts = 0
             nrf.send(payload)
             try:
                 nrf.wait_until_sent()
@@ -113,11 +114,12 @@ def main():
             
             if nrf.get_packages_lost() == 0:
                 print(f"Success: lost={nrf.get_packages_lost()}, retries={nrf.get_retries()}")
+                retryAttempts = 0
                 i += 1
             else:
                 print(f"Error: lost={nrf.get_packages_lost()}, retries={nrf.get_retries()}")
-                attempts += 1
-                print("** Resending Payload. Retry count: " + str(15*attempts))
+                retryAttempts += 1
+                print("** Resending Payload. Retry count: " + str(15*retryAttempts))
                 time.sleep(0.2)
 
             
