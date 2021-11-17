@@ -10,6 +10,8 @@ import RPi.GPIO as GPIO
 import time
 from time import sleep
 
+import son
+
 # LED outputs, initialized at low level
 LED1 = 18
 LED2 = 16
@@ -85,7 +87,7 @@ def read_switches():
 def main():
     config()
     while True:
-        read_switches() 
+        son.main()
         sleep(0.1)  
 
 
