@@ -89,7 +89,7 @@ def read_switches():
 def read_master_sw():
 
     read_switches()
-    print("Read master switch (ON/OFF)")
+    print("Got master switch: ", str(rSW1))
 
     if (rSW1 == 1): 
         return True
