@@ -85,6 +85,8 @@ def read_switches():
  
     print("Read switches")
 
+    return rSW1
+
 
 def control_led(led: int, state: bool):
     if (led == 1):

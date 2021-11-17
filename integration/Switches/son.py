@@ -16,7 +16,8 @@ import parent
 def main():
     while True:
         print("son loop") 
-        parent.read_switches()
+        master = parent.read_switches()
+        print(master)
         parent.control_led(2, True)
         sleep(0.1)  
 
