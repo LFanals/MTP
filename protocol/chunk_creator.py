@@ -51,7 +51,9 @@ def compress_chunk(chunk: str) -> bytearray:
 
 def main():
     # For testing purposes
-    chunks = get_file_chunks("large_entire.txt", 10)
+    # chunks = get_file_chunks("large_entire.txt", 10)
+    # chunks = get_file_chunks("test_files/utf8.txt", 10)
+    chunks = get_file_chunks("test_files/Quick-Mode-F21-Test-File.txt", 10)
     print("Number of compressed chunks: " + str(len(chunks)))
 
 if __name__ == "__main__":
