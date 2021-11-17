@@ -85,7 +85,16 @@ def read_switches():
  
     print("Read switches")
 
-    return rSW1
+
+def read_master_sw():
+
+    read_switches()
+    print("Read master switch (ON/OFF)")
+
+    if (rSW1 == 1): 
+        return True
+    elif (rSW1 == 0): 
+        return False
 
 
 def control_led(led: int, state: bool):
@@ -112,9 +121,11 @@ def control_led(led: int, state: bool):
 
 def main():
     config()
-    while True:
-        son.main()
+    while (read_master_sw() == False):
         sleep(0.1)  
+
+    read_switches() # get switches config, decide which son to run
+    son.main()
 
 
 if __name__ == "__main__":

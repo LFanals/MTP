@@ -16,9 +16,11 @@ import parent
 def main():
     while True:
         print("son loop") 
-        master = parent.read_switches()
-        print(master)
         parent.control_led(2, True)
+
+        if (read_master_sw() = False): # Master switch goes to 0
+            print("Son execution finished")
+
         sleep(0.1)  
 
 
