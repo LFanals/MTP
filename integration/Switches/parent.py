@@ -86,6 +86,28 @@ def read_switches():
     print("Read switches")
 
 
+def control_led(led: int, state: bool):
+    if (led == 1):
+        if (bool): GPIO.output(LED1, GPIO.HIGH)
+        else: GPIO.output(LED1, GPIO.LOW)
+    elif (led == 2):
+        if (bool): GPIO.output(LED2, GPIO.HIGH)
+        else: GPIO.output(LED2, GPIO.LOW)
+    elif (led == 3):
+        if (bool): GPIO.output(LED3, GPIO.HIGH)
+        else: GPIO.output(LED3, GPIO.LOW)
+    elif (led == 4):
+        if (bool): GPIO.output(LED4, GPIO.HIGH)
+        else: GPIO.output(LED4, GPIO.LOW)
+    elif (led == 5):
+        if (bool): GPIO.output(LED5, GPIO.HIGH)
+        else: GPIO.output(LED1, GPIO.LOW)
+    else:
+        print("Bad led number")
+
+    print("Controlled led")
+
+
 def main():
     config()
     while True:

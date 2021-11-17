@@ -17,6 +17,7 @@ def main():
     while True:
         print("son loop") 
         parent.read_switches()
+        parent.control_led(2, True)
         sleep(0.1)  
 
 
