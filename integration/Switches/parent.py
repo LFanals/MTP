@@ -73,7 +73,7 @@ def config():
 def read_switches():
     iSW1 = GPIO.input(SW1)
     iSW2 = GPIO.input(SW2)
-    iSW3 = GPIO.input(SW2)
+    iSW3 = GPIO.input(SW3)
     iSW4 = GPIO.input(SW4)
     iSW5 = GPIO.input(SW5)
 
