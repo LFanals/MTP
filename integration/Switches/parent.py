@@ -55,11 +55,17 @@ def config():
     GPIO.output(LED5, GPIO.LOW)
     
     # Inputs     
-    GPIO.setup(SW1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(SW2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(SW3, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(SW4, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(SW5, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    # GPIO.setup(SW1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    # GPIO.setup(SW2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    # GPIO.setup(SW3, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    # GPIO.setup(SW4, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    # GPIO.setup(SW5, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+ 
+    GPIO.setup(SW1, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(SW2, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(SW3, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(SW4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(SW5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
      
     print("Configured IO")    
 
@@ -70,6 +76,12 @@ def read_switches():
     iSW3 = GPIO.input(SW2)
     iSW4 = GPIO.input(SW4)
     iSW5 = GPIO.input(SW5)
+
+    print(iSW1)
+    print(iSW2)
+    print(iSW3)
+    print(iSW4)
+    print(iSW5)
 
     iiSW1 = iSW1
     iiSW2 = iSW2
@@ -121,6 +133,7 @@ def control_led(led: int, state: bool):
 
 def main():
     config()
+    control_led(1, True)
     while (read_master_sw() == False):
         sleep(0.1)  
 
