@@ -83,7 +83,7 @@ if __name__ == "__main__":
                     print('TYPE: chunk_info')
                 elif payload[0] == 0x02:
                     datacount += 1
-                    print("TYPE: data, count: " + str(datacount));
+                    print("TYPE: data, count: " + str(datacount))
                 else: 
                     print("unknown type")
                 

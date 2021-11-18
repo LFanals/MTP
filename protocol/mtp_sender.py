@@ -19,7 +19,7 @@ def start_sender():
     nrf = setup_sender()
 
     # Get file chunks
-    chunks = chunk_handler.get_file_chunks()
+    chunks = chunk_handler.get_file_chunks("small.txt", 2)
     subchunks = packet_creator.create_data_frames(chunks)
 
     # Send Hello frame
@@ -47,6 +47,8 @@ def start_sender():
             if not send_subchunk(subchunk):
                 # TODO: handle data frame didn't work
                 sys.exit()
+
+    print("Reached end of program. In theory all data has been sent correctly")
 
 def setup_sender():
     print("Setting up the NRF24 configuration")
@@ -90,11 +92,8 @@ def send_hello(chunk_num: int):
         # TODO: Handle package is lost
         sys.exit()
 
-    ack_payload = get_ack_payload()
-    if ack_payload[0] == '0x01':
-        return True
-    else:
-        return False
+    # Check if ack is positive
+    return is_ack_positive(get_ack_payload())
 
 
 def send_chunk_info(subchunk_num, chunk_id):
@@ -114,9 +113,8 @@ def send_chunk_info(subchunk_num, chunk_id):
         # TODO: Handle package is lost
         sys.exit()
 
-    ack_payload = get_ack_payload()
-
-    # TODO: Check if ACK is positive
+    # Check if ACK is positive
+    return is_ack_positive(get_ack_payload())
 
 def send_subchunk(subchunk):
     # Sends a subchunk data frame, waits for the ack
@@ -130,9 +128,8 @@ def send_subchunk(subchunk):
         # TODO: Handle package is lost
         sys.exit()
 
-    ack_payload = get_ack_payload()
-    # TODO: Check if ACK is positive
-    return True
+    # Check if ACK is positive
+    return is_ack_positive(get_ack_payload())
 
 def send(payload) -> bool:
     # Sends the a packet and waits until it is sent

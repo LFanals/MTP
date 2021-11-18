@@ -4,7 +4,6 @@ from mtp_sender import start_sender
 
 def main():
     # Get transmitter or receiver arguments
-    mode = -1
     try:
         if(sys.argv[1] == "s"):
             start_sender()
