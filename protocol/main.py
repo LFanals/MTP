@@ -11,10 +11,10 @@ def main():
             start_receiver()
         else:
             # Invalid argument
-            raise Exception() 
-    except:
+            raise AttributeError() 
+    except AttributeError:
         print("An argument must be passed. The argument can be: 's' for sender or 'r' for receiver.\nTry calling 'python3 main.py s")
-        return
+        sys.exit()
 
 if __name__ == "__main__":
     main()

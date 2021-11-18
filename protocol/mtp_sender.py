@@ -15,7 +15,6 @@ def start_sender():
     print("Starting sender")
 
     # Setup nrf24 sender
-    global nrf
     nrf = setup_sender()
 
     # Get file chunks
@@ -23,11 +22,13 @@ def start_sender():
     subchunks = packet_creator.create_data_frames(chunks)
 
     # Send Hello frame
-    if not send_hello(len(chunks)):
-        # Hello didn't work 
-        # TODO: Handle this case
-        print("Hello didn't work. Aborting...")
-        sys.exit()
+    ready = False
+    while not ready:
+        if not send_hello(nrf, len(chunks)):
+            # Hello didn't work 
+            print("Hello didn't work. Sending again hello package...")
+        else:
+            ready = True
 
     # Start sending the data frames
     # For each chunk we send a chunk_info frame with the number of subchunks and the chunk id
@@ -36,18 +37,21 @@ def start_sender():
         subchunk_num = len(subchunks[chunk_id])
         ready = False
         while not ready:
-            if not send_chunk_info(subchunk_num, chunk_id):
-                # Receiver is not ready yet. Wait and try again
+            if not send_chunk_info(nrf, subchunk_num, chunk_id):
+                # Receiver is not ready yet or the ack has been lost. Wait and try again
+                print("Positive ack not received to chunk_info frame, sending again...")
                 time.sleep(1)
-                ready = False
             else:
                 ready = True
         # Receiver is ready to receive the data frames
         for subchunk in subchunks[chunk_id]:
-            if not send_subchunk(subchunk):
-                # TODO: handle data frame didn't work
-                sys.exit()
-
+            ready = False
+            while not ready:
+                if not send_subchunk(nrf, subchunk):
+                    print("Positive ack not received to data frame, sending again...")
+                    time.sleep(1)
+                else:
+                    ready = True
     print("Reached end of program. In theory all data has been sent correctly")
 
 def setup_sender():
@@ -76,62 +80,79 @@ def create_sender_nrf(pi, address):
 
     return nrf
 
-def send_hello(chunk_num: int):
+def send_hello(nrf: NRF24, chunk_num: int) -> bool:
     # Sends the hello frame, waits for the ack and checks that it is positive
     # If everything is successful returns true
 
-    print("Sending hello frame")
     # Create and send hello frame
     payload = packet_creator.create_hello_frame(chunk_num)
-    if not send(payload):
+    print("Sending hello frame -> num of chunks: " + str(chunk_num))
+    if not send(nrf, payload):
         # TODO: Handle case when timeout is exceeded
         sys.exit()
 
     # Get ACK
-    if is_package_lost():
+    if is_package_lost(nrf):
         # TODO: Handle package is lost
         sys.exit()
 
     # Check if ack is positive
-    return is_ack_positive(get_ack_payload())
+    (ack_received, ack_payload) = get_ack_payload(nrf)
+
+    if not ack_received:
+        return False
+
+    return is_ack_positive(ack_payload)
 
 
-def send_chunk_info(subchunk_num, chunk_id):
+def send_chunk_info(nrf: NRF24, subchunk_num, chunk_id):
     # Sends the chunk info frame, waits for the ack and checks that is it positive
     # If everything is successful returns true
 
-    print("Sending chunk info frame")
     # Create and send chunk_info frame
     payload = packet_creator.create_chunk_info_frame(subchunk_num, chunk_id)
 
-    if not send(payload):
+    print("Sending chunk info frame -> chunk id: " + str(chunk_id) + ", num of subchunks: " + str(subchunk_num))
+    if not send(nrf, payload):
         # TODO: Handle case when timeout is exceeded
         sys.exit()
 
     # Get ACK
-    if is_package_lost():
+    if is_package_lost(nrf):
         # TODO: Handle package is lost
         sys.exit()
 
     # Check if ACK is positive
-    return is_ack_positive(get_ack_payload())
+    (ack_received, ack_payload) = get_ack_payload(nrf)
 
-def send_subchunk(subchunk):
+    if not ack_received:
+       return False 
+
+    return is_ack_positive(ack_payload)
+
+def send_subchunk(nrf: NRF24, subchunk):
     # Sends a subchunk data frame, waits for the ack
     # If everything is successful returns true
-    if not send(subchunk):
+
+    print("Sending data frame")
+    if not send(nrf, subchunk):
         # TODO: Handle case when timeout is exceeded
         sys.exit()
 
     # Get ACK
-    if is_package_lost():
+    if is_package_lost(nrf):
         # TODO: Handle package is lost
         sys.exit()
 
     # Check if ACK is positive
-    return is_ack_positive(get_ack_payload())
+    (ack_received, ack_payload) = get_ack_payload(nrf)
 
-def send(payload) -> bool:
+    if not ack_received:
+        return False
+
+    return is_ack_positive(ack_payload)
+
+def send(nrf: NRF24, payload) -> bool:
     # Sends the a packet and waits until it is sent
     # If timeout exideed returns False, True otherwise
     
@@ -147,18 +168,20 @@ def send(payload) -> bool:
         timeout = True
     return not timeout
 
-def get_ack_payload():
+def get_ack_payload(nrf: NRF24):
     # Check if an acknowledgement package is available.
     if nrf.data_ready():
         # Get payload.
         payload = nrf.get_payload()
-        print("ACK payload: " + payload)
+        #print("ACK payload: " + str(payload))
+        return (True, payload)
 
     else:
-        print("No acknowledgement package received.")
+        print("No acknowledgement payload package received.")
         # TODO: Handle this case when the ack doesn't arrive 
+        return (False, -1)
 
-def is_package_lost():
+def is_package_lost(nrf: NRF24):
     # Returns true if package has been lost
 
     if nrf.get_packages_lost() != 0:
@@ -167,8 +190,9 @@ def is_package_lost():
     return False
 
 def is_ack_positive(ack_payload):
-
-    if ack_payload[0] == '0x01':
+    if ack_payload[0] == 1:
+        print("Checking ack -> Positive")
         return True
 
+    print("Checking ack -> Negative")
     return False
