@@ -205,7 +205,7 @@ def get_ack_payload(nrf: NRF24):
         return (True, payload)
 
     else:
-        print("No acknowledgement payload package received.")
+        # print("No acknowledgement payload package received.")å
         # TODO: Handle this case when the ack doesn't arrive 
         return (False, -1)
 
