@@ -105,6 +105,7 @@ def send_hello(nrf: NRF24, chunk_num: int) -> bool:
 
         if not ack_received:
             print("  * ACK for hello frame not received. Retrying transmission. Attempt: " + str(attempt))
+            time.sleep(1)
             attempt += 1
         
         else: 
@@ -139,9 +140,11 @@ def send_chunk_info(nrf: NRF24, subchunk_num, chunk_id):
 
         if not ack_received:
             print("  * ACK for chunk info frame not received. Retrying transmission. Attempt: " + str(attempt))
+            time.sleep(0.1)
             attempt += 1
         
-        attempt = 0
+        else: 
+            attempt = 0
 
     return is_ack_positive(ack_payload)
 
@@ -150,20 +153,30 @@ def send_subchunk(nrf: NRF24, subchunk):
     # If everything is successful returns true
 
     print("Sending data frame")
-    if not send(nrf, subchunk):
-        # TODO: Handle case when timeout is exceeded
-        sys.exit()
+    
+    attempt = 1
+    while attempt:
+        if not send(nrf, payload):
+            # TODO: Handle case when timeout is exceeded
+            print("  * Timeout sending data frame. Retrying transmission. Attempt: " + str(attempt))
+            attempt += 1
 
-    # Get ACK
-    if is_package_lost(nrf):
-        # TODO: Handle package is lost
-        sys.exit()
+        # Get ACK
+        if is_package_lost(nrf):
+            # TODO: Handle package is lost
+            print("  * Data frame lost. Retrying transmission. Attempt: " + str(attempt))
+            attempt += 1
 
-    # Check if ACK is positive
-    (ack_received, ack_payload) = get_ack_payload(nrf)
+        # Check if ACK is positive
+        (ack_received, ack_payload) = get_ack_payload(nrf)
 
-    if not ack_received:
-        return False
+        if not ack_received:
+            print("  * ACK for data frame not received. Retrying transmission. Attempt: " + str(attempt))
+            time.sleep(0.1)
+            attempt += 1
+        
+        else: 
+            attempt = 0
 
     return is_ack_positive(ack_payload)
 
