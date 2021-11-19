@@ -156,7 +156,7 @@ def send_subchunk(nrf: NRF24, subchunk):
     
     attempt = 1
     while attempt:
-        if not send(nrf, payload):
+        if not send(nrf, subchunk):
             # TODO: Handle case when timeout is exceeded
             print("  * Timeout sending data frame. Retrying transmission. Attempt: " + str(attempt))
             attempt += 1
