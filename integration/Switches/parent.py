@@ -46,7 +46,6 @@ def config():
     GPIO.output(LED4, GPIO.LOW)
     GPIO.output(LED5, GPIO.LOW)
     
-    # Inputs. If SW is open there's a 1 at the input
     GPIO.setup(SW1, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(SW2, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(SW3, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -61,7 +60,7 @@ def read_switches():
     # Returns boolean to indicate if all switches are stable and array with values
     iSW1 = GPIO.input(SW1)
     iSW2 = GPIO.input(SW2)
-    iSW3 = GPIO.input(SW2)
+    iSW3 = GPIO.input(SW3)
     iSW4 = GPIO.input(SW4)
     iSW5 = GPIO.input(SW5)
 
@@ -72,6 +71,8 @@ def read_switches():
     iiSW3 = GPIO.input(SW2)
     iiSW4 = GPIO.input(SW4)
     iiSW5 = GPIO.input(SW5)
+
+    print("Read switches")
 
     if (iSW1 == iiSW1 and iSW2 == iiSW2 and iSW3 == iiSW3 and iSW4 == iiSW4 and iSW5 == iiSW5):
         return True, [iSW1, iSW2, iSW3, iSW4, iSW5] 
