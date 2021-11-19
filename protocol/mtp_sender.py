@@ -95,10 +95,10 @@ def send_hello(nrf: NRF24, chunk_num: int) -> bool:
             attempt += 1
 
         # Get ACK
-        if is_package_lost(nrf):
-            # TODO: Handle package is lost
-            print("  * Hello frame lost. Retrying transmission. Attempt: " + str(attempt))
-            attempt += 1
+        # if is_package_lost(nrf):
+        #     # TODO: Handle package is lost
+        #     print("  * Hello frame lost. Retrying transmission. Attempt: " + str(attempt))
+        #     attempt += 1
 
         # Check if ACK is positive
         (ack_received, ack_payload) = get_ack_payload(nrf)
@@ -130,10 +130,10 @@ def send_chunk_info(nrf: NRF24, subchunk_num, chunk_id):
             attempt += 1
 
         # Get ACK
-        if is_package_lost(nrf):
-            # TODO: Handle package is lost
-            print("  * Chunk info frame lost. Retrying transmission. Attempt: " + str(attempt))
-            attempt += 1
+        # if is_package_lost(nrf):
+        #     # TODO: Handle package is lost
+        #     print("  * Chunk info frame lost. Retrying transmission. Attempt: " + str(attempt))
+        #     attempt += 1
 
         # Check if ACK is positive
         (ack_received, ack_payload) = get_ack_payload(nrf)
@@ -162,10 +162,10 @@ def send_subchunk(nrf: NRF24, subchunk):
             attempt += 1
 
         # Get ACK
-        if is_package_lost(nrf):
-            # TODO: Handle package is lost
-            print("  * Data frame lost. Retrying transmission. Attempt: " + str(attempt))
-            attempt += 1
+        # if is_package_lost(nrf):
+        #     # TODO: Handle package is lost
+        #     print("  * Data frame lost. Retrying transmission. Attempt: " + str(attempt))
+        #     attempt += 1
 
         # Check if ACK is positive
         (ack_received, ack_payload) = get_ack_payload(nrf)
@@ -214,7 +214,6 @@ def is_package_lost(nrf: NRF24):
 
     if nrf.get_packages_lost() != 0:
         print("Package is lost")
-        nrf.reset_packages_lost()
         return True
     return False
 
