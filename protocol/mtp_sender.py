@@ -87,20 +87,27 @@ def send_hello(nrf: NRF24, chunk_num: int) -> bool:
     # Create and send hello frame
     payload = packet_creator.create_hello_frame(chunk_num)
     print("Sending hello frame -> num of chunks: " + str(chunk_num))
-    if not send(nrf, payload):
-        # TODO: Handle case when timeout is exceeded
-        sys.exit()
+    attempt = 1
+    while attempt != 0:
+        if not send(nrf, payload):
+            # TODO: Handle case when timeout is exceeded
+            print("  * Timeout sending chunk info frame. Retrying transmission. Attempt: " + str(attempt))
+            attempt += 1
 
-    # Get ACK
-    if is_package_lost(nrf):
-        # TODO: Handle package is lost
-        sys.exit()
+        # Get ACK
+        if is_package_lost(nrf):
+            # TODO: Handle package is lost
+            print("  * Chunk info frame lost. Retrying transmission. Attempt: " + str(attempt))
+            attempt += 1
 
-    # Check if ack is positive
-    (ack_received, ack_payload) = get_ack_payload(nrf)
+        # Check if ACK is positive
+        (ack_received, ack_payload) = get_ack_payload(nrf)
 
-    if not ack_received:
-        return False
+        if not ack_received:
+            print("  * ACK for hello frame not received. Retrying transmission. Attempt: " + str(attempt))
+            attempt += 1
+        
+        attempt = 0
 
     return is_ack_positive(ack_payload)
 
@@ -111,22 +118,29 @@ def send_chunk_info(nrf: NRF24, subchunk_num, chunk_id):
 
     # Create and send chunk_info frame
     payload = packet_creator.create_chunk_info_frame(subchunk_num, chunk_id)
-
     print("Sending chunk info frame -> chunk id: " + str(chunk_id) + ", num of subchunks: " + str(subchunk_num))
-    if not send(nrf, payload):
-        # TODO: Handle case when timeout is exceeded
-        sys.exit()
 
-    # Get ACK
-    if is_package_lost(nrf):
-        # TODO: Handle package is lost
-        sys.exit()
+    attempt = 1
+    while attempt != 0:
+        if not send(nrf, payload):
+            # TODO: Handle case when timeout is exceeded
+            print("  * Timeout sending chunk info frame. Retrying transmission. Attempt: " + str(attempt))
+            attempt += 1
 
-    # Check if ACK is positive
-    (ack_received, ack_payload) = get_ack_payload(nrf)
+        # Get ACK
+        if is_package_lost(nrf):
+            # TODO: Handle package is lost
+            print("  * Chunk info frame lost. Retrying transmission. Attempt: " + str(attempt))
+            attempt += 1
 
-    if not ack_received:
-       return False 
+        # Check if ACK is positive
+        (ack_received, ack_payload) = get_ack_payload(nrf)
+
+        if not ack_received:
+            print("  * ACK for chunk info frame not received. Retrying transmission. Attempt: " + str(attempt))
+            attempt += 1
+        
+        attempt = 0
 
     return is_ack_positive(ack_payload)
 
@@ -186,6 +200,7 @@ def is_package_lost(nrf: NRF24):
 
     if nrf.get_packages_lost() != 0:
         print("Package is lost")
+        nrf.reset_packages_lost()
         return True
     return False
 
