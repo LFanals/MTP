@@ -45,6 +45,9 @@ def start_receiver():
                 # TODO: handle case when packet received is not a data frame
                 sys.exit()
             
+            if not subchunk_id%10:
+                print("Received until subchunk " + str(subchunk_id))
+            
             # Add the data to the chunk data bytearray
             chunk_data.extend(data)
         
@@ -105,10 +108,9 @@ def wait_hello(nrf: NRF24):
 
 def wait_chunk_info(nrf: NRF24): 
 
+    wait_data(nrf)
     # Set a positive payload for the next ack
     set_next_ack(nrf, True)
-
-    wait_data(nrf)
 
     # Data is available, check it is chunk_info frame
     payload = nrf.get_payload()
@@ -130,10 +132,9 @@ def wait_chunk_info(nrf: NRF24):
 
 def wait_data_frame(nrf: NRF24):
 
+    wait_data(nrf)
     # Set a positive payload for the next ack
     set_next_ack(nrf, True)
-
-    wait_data(nrf)
 
     # Data is available, check it is data frame
     payload = nrf.get_payload()
