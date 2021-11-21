@@ -18,7 +18,7 @@ def start_sender():
     nrf = setup_sender()
 
     # Get file chunks
-    chunk_size = 100
+    chunk_size = 300
     chunks = chunk_handler.get_file_chunks("large_entire.txt", chunk_size)
     subchunks = packet_creator.create_data_frames(chunks)
 

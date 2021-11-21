@@ -98,7 +98,7 @@ def wait_hello(nrf: NRF24):
         print("Frame received is not a hello frame: payload[0] = " + str(payload[0]))
         return (False, -1)
 
-    num_chunks = payload[1]
+    num_chunks = int.from_bytes([payload[1], payload[2]], "little")
     print("Hello frame received -> num of chunks: " + str(num_chunks))
 
     return (True, num_chunks)

@@ -24,7 +24,9 @@ def zero_padd_list(list, N):
 
 def create_hello_frame(chunk_amount):
     print("Creating Hello Frame")
-    frame = [HELLO_PREFIX, chunk_amount]
+    
+    b_chunk_amount = chunk_amount.to_bytes(2, 'little')
+    frame = [HELLO_PREFIX, b_chunk_amount[0], b_chunk_amount[1]]
     frame = zero_padd_list(frame, SUBCHUNK_SIZE)
     frame = bytearray(frame)
     return frame
