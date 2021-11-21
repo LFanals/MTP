@@ -87,7 +87,7 @@ def is_master_on():
         return False
     else:
         print("Got master switch: ", str(SW[0]))
-        if (SW[0]) == 1):
+        if (SW[0] == 1):
             return True
         else:
             return False
@@ -109,11 +109,11 @@ def control_led(led: int, state: bool):
         else: GPIO.output(LED4, GPIO.LOW)
     elif (led == 5):
         if (state): GPIO.output(LED5, GPIO.HIGH)
-        else: GPIO.output(LED1, GPIO.LOW)
+        else: GPIO.output(LED5, GPIO.LOW)
     else:
         print("Bad led number")
 
-    print("Controlled led")
+    # print("Controlled led")
 
 
 def main():

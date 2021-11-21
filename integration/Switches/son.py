@@ -15,14 +15,28 @@ import parent
 
 
 def main():
+    print("Son loop") 
+    parent.config()
     while True:
-        print("son loop") 
+            
+        if (parent.is_master_on() == True): # Master switch goes to 0, the son programs have to stop
+            print("Son execution started")
+
+        parent.control_led(1, True)
         parent.control_led(2, True)
+        parent.control_led(3, True)
+        parent.control_led(4, True)
+        parent.control_led(5, True)
+        sleep(0.5)
+        parent.control_led(1, False)
+        parent.control_led(2, False)
+        parent.control_led(3, False)
+        parent.control_led(4, False)
+        parent.control_led(5, False)
+        sleep(0.5)
 
-        if (read_master_sw() == False): # Master switch goes to 0, the son programs have to stop
+        if (parent.is_master_on() == False): # Master switch goes to 0, the son programs have to stop
             print("Son execution finished")
-
-        sleep(0.1)  
 
 
 if __name__ == "__main__":
