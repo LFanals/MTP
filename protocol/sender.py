@@ -1,4 +1,4 @@
-import chunk_creator
+import chunk_handler
 import packet_creator
 
 import argparse
@@ -22,7 +22,7 @@ def main():
     chunk_size = 100
 
     # Creating Chunks
-    chunk_list = chunk_creator.get_file_chunks("large_entire.txt", chunk_size)
+    chunk_list = chunk_handler.get_file_chunks("large_entire.txt", chunk_size)
     chunk_amount = len(chunk_list)
     print("Number of compressed chunks: " + str(chunk_amount))
     
