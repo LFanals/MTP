@@ -13,6 +13,7 @@ import time
 
 def start_sender():
     print("Starting sender")
+    time_start = time.time()
 
     # Setup nrf24 sender
     nrf = setup_sender()
@@ -54,6 +55,8 @@ def start_sender():
                 else:
                     ready = True
     print("Reached end of program. In theory all data has been sent correctly")
+    time_end = time.time()
+    print("Time elapsed: " + str(time_end - time_start))
 
 def setup_sender():
     print("Setting up the NRF24 configuration")
