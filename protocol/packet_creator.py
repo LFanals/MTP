@@ -34,8 +34,9 @@ def create_chunk_info_frame(subchunk_amount, chunk_id):
     print("Creating Chunk Info Frame")
     # TODO: Re-implement this function to ensure two bytes for amount
     # It will break if subchunk amount is bigger than 255
+    b_subchunk_amount = subchunk_amount.to_bytes(2, 'little')
 
-    frame = [CHUNK_INFO_PREFIX, subchunk_amount, chunk_id]
+    frame = [CHUNK_INFO_PREFIX, b_subchunk_amount[1], b_subchunk_amount[0], chunk_id]
     frame = zero_padd_list(frame, SUBCHUNK_SIZE)
     frame = bytearray(frame)
     return frame
