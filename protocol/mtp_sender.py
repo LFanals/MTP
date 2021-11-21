@@ -18,7 +18,8 @@ def start_sender():
     nrf = setup_sender()
 
     # Get file chunks
-    chunks = chunk_handler.get_file_chunks("large_entire.txt", 2)
+    chunk_size = 100
+    chunks = chunk_handler.get_file_chunks("large_entire.txt", chunk_size)
     subchunks = packet_creator.create_data_frames(chunks)
 
     # Send Hello frame
