@@ -9,17 +9,18 @@ from nrf24 import *
 # General imports
 import sys
 import time
+import ioparent
 
 
-def start_sender():
+def start_sender(chunk_size):
     print("Starting sender")
+    ioparent.control_led(1, True)
     time_start = time.time()
 
     # Setup nrf24 sender
     nrf = setup_sender()
 
     # Get file chunks
-    chunk_size = 80
     chunks = chunk_handler.get_file_chunks("large_entire.txt", chunk_size)
     subchunks = packet_creator.create_data_frames(chunks)
 
@@ -57,6 +58,7 @@ def start_sender():
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))
+    ioparent.control_led(1, False)
 
 def setup_sender():
     print("Setting up the NRF24 configuration")

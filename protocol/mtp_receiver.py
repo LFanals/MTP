@@ -1,6 +1,7 @@
 # local imports 
 import protocol_utils as p_utils
 import chunk_handler
+import ioparent
 
 # nrf24 library import
 from nrf24 import *
@@ -21,8 +22,18 @@ def start_receiver():
         sys.exit()
     
     # At this point a positive ack has been sent
+    ioparent.control_led(1, True)
+    ioparent.control_led(3, True)
 
     for i in range(num_chunks):
+        
+        # LEDs 3, 4 and 5 will indicate the received percentage
+        if i > 2*num_chunks/3: 
+            ioparent.control_led(4, True)
+        elif i == num_chunks:
+            ioparent.control_led(5, True)
+
+
         chunk_data = bytearray()
         # Wait for chunk_info
         is_chunk_info = False
@@ -57,6 +68,8 @@ def start_receiver():
         # for testing purposes we just print it to console
         print("------------chunk id: " + str(chunk_id) + "----------------")
         print(chunk_handler.decompress_chunk(chunk_data))
+    
+    # TODO: detect that he has received all the chunks and stop. Then turn LED1 to 0.
 
 
 def setup_receiver():
