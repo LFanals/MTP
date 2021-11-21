@@ -45,6 +45,9 @@ def start_receiver():
                 # TODO: handle case when packet received is not a data frame
                 sys.exit()
             
+            if (subchunk_id is not 0) and (not subchunk_id%10):
+                print("Received until subchunk " + str(subchunk_id))
+            
             # Add the data to the chunk data bytearray
             chunk_data.extend(data)
         
@@ -87,10 +90,10 @@ def create_receiver_nrf(pi, address):
 
 def wait_hello(nrf: NRF24):
 
+    wait_data(nrf)
+
     # Set a positive payload for the next ack
     set_next_ack(nrf, True)
-
-    wait_data(nrf)
     
     # Data is available, check it is hello frame
     payload = nrf.get_payload()
@@ -98,17 +101,16 @@ def wait_hello(nrf: NRF24):
         print("Frame received is not a hello frame: payload[0] = " + str(payload[0]))
         return (False, -1)
 
-    num_chunks = payload[1]
+    num_chunks = int.from_bytes([payload[1], payload[2]], "little")
     print("Hello frame received -> num of chunks: " + str(num_chunks))
 
     return (True, num_chunks)
 
 def wait_chunk_info(nrf: NRF24): 
 
+    wait_data(nrf)
     # Set a positive payload for the next ack
     set_next_ack(nrf, True)
-
-    wait_data(nrf)
 
     # Data is available, check it is chunk_info frame
     payload = nrf.get_payload()
@@ -121,8 +123,8 @@ def wait_chunk_info(nrf: NRF24):
     #chunk_id = payload[3]
 
     # Temporal workaround while create_chunk_info_frame() is not working properly
-    subchunks_num = payload[1]
-    chunk_id = payload[2] 
+    subchunks_num = int.from_bytes([payload[1], payload[2]], "little")
+    chunk_id = payload[3] 
 
     print("Chunk_info received -> Chunk id: " + str(chunk_id) + ", num of subchunks: " + str(subchunks_num))
     
@@ -130,10 +132,9 @@ def wait_chunk_info(nrf: NRF24):
 
 def wait_data_frame(nrf: NRF24):
 
+    wait_data(nrf)
     # Set a positive payload for the next ack
     set_next_ack(nrf, True)
-
-    wait_data(nrf)
 
     # Data is available, check it is data frame
     payload = nrf.get_payload()
