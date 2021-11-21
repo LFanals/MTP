@@ -45,7 +45,7 @@ def start_receiver():
                 # TODO: handle case when packet received is not a data frame
                 sys.exit()
             
-            if not subchunk_id%10:
+            if (subchunk_id is not 0) and (not subchunk_id%10):
                 print("Received until subchunk " + str(subchunk_id))
             
             # Add the data to the chunk data bytearray
