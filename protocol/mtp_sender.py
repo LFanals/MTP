@@ -10,6 +10,7 @@ from nrf24 import *
 import subprocess
 import time
 import os
+import sys
 
 
 def start_sender():
@@ -21,15 +22,8 @@ def start_sender():
     # Copy file from USB to working directory
     subprocess.call("./read_usb.sh")
 
-    # Get list of files from working directory
-    files = [f for f in os.listdir(p_utils.WORKING_DIR) if os.isfile(str.join(p_utils.WORKING_DIR, f))]
-
-    # We will send only one file
-    if len(files) == 0:
-        print("No files found in the working directory. Aborting...")
-        return
-
-    filename = files[0]
+    # Get file from working directory
+    filename = get_file_from_working_dir()
 
     # Get file chunks
     chunks = chunk_handler.get_file_chunks(filename, 2)
@@ -67,6 +61,20 @@ def start_sender():
                 else:
                     ready = True
     print("Reached end of program. In theory all data has been sent correctly")
+
+def get_file_from_working_dir() -> str:
+
+    # Get list of files in working directory
+    files = [f for f in os.listdir(p_utils.WORKING_DIR) if os.path.isfile(os.path.join(p_utils.WORKING_DIR, f))]
+
+    # We will send only one file
+    if len(files) == 0:
+        print("No files found in the working directory. Aborting...")
+        sys.exit()
+    filename = os.path.join(p_utils.WORKING_DIR, files[0])
+
+    print("File to send: " + filename)
+    return filename
 
 def setup_sender():
     print("Setting up the NRF24 configuration")
