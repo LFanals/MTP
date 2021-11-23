@@ -7,8 +7,9 @@ import protocol_utils as p_utils
 from nrf24 import *
 
 # General imports
-import sys
+import subprocess
 import time
+import os
 
 
 def start_sender():
@@ -17,8 +18,21 @@ def start_sender():
     # Setup nrf24 sender
     nrf = setup_sender()
 
+    # Copy file from USB to working directory
+    subprocess.call("./read_usb.sh")
+
+    # Get list of files from working directory
+    files = [f for f in os.listdir(p_utils.WORKING_DIR) if os.isfile(str.join(p_utils.WORKING_DIR, f))]
+
+    # We will send only one file
+    if len(files) == 0:
+        print("No files found in the working directory. Aborting...")
+        return
+
+    filename = files[0]
+
     # Get file chunks
-    chunks = chunk_handler.get_file_chunks("small.txt", 2)
+    chunks = chunk_handler.get_file_chunks(filename, 2)
     subchunks = packet_creator.create_data_frames(chunks)
 
     # Send Hello frame

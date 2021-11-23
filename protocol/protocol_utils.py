@@ -3,6 +3,7 @@ import pigpio
 import sys
 
 ADDRESS = "MTPC"
+WORKING_DIR = "~/working-directory"
 
 def connect_to_gpio(hostname, port):
     # Connect to pigpiod
