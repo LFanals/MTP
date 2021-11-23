@@ -90,7 +90,7 @@ def create_receiver_nrf(pi, address):
     # Create NRF24 object.
     # PLEASE NOTE: PA level is set to MIN, because test sender/receivers are often close to each other, and then MIN works better.
     # ALSO NOTE: pauload size is set to ACK. That means that payload is variable and acks can contain payload as well
-    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.ACK, channel=100, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.MIN)
+    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.ACK, channel=100, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.HIGH)
     nrf.set_address_bytes(len(address))
 
     # Listen on the address specified as parameter
@@ -169,7 +169,7 @@ def set_next_ack(nrf: NRF24, positive):
 def wait_data(nrf: NRF24):
     print("Waiting for new data...")
     while not nrf.data_ready():
-        time.sleep(0.01)
+        time.sleep(0.0001)
 
 def clean_working_dir(filename):
     try:

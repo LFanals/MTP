@@ -49,7 +49,7 @@ def start_sender():
             if not send_chunk_info(nrf, subchunk_num, chunk_id):
                 # Receiver is not ready yet or the ack has been lost. Wait and try again
                 print("Positive ack not received to chunk_info frame, sending again...")
-                time.sleep(1)
+                time.sleep(0.0001)
             else:
                 ready = True
         # Receiver is ready to receive the data frames
@@ -58,7 +58,7 @@ def start_sender():
             while not ready:
                 if not send_subchunk(nrf, subchunk):
                     print("Positive ack not received to data frame, sending again...")
-                    time.sleep(1)
+                    time.sleep(0.0001)
                 else:
                     ready = True
     print("Reached end of program. In theory all data has been sent correctly")
@@ -95,7 +95,7 @@ def setup_sender():
 def create_sender_nrf(pi, address):
     # Create NRF24 object.
     # PLEASE NOTE: PA level is set to MIN, because test sender/receivers are often close to each other, and then MIN works better.
-    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.ACK, channel=100, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.LOW)
+    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.ACK, channel=100, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.HIGH)
     nrf.set_address_bytes(len(address))
     nrf.set_retransmission(15, 15)
     nrf.open_writing_pipe(address)
@@ -130,7 +130,7 @@ def send_hello(nrf: NRF24, chunk_num: int) -> bool:
 
         if not ack_received:
             print("  * ACK for hello frame not received. Retrying transmission. Attempt: " + str(attempt))
-            time.sleep(1)
+            time.sleep(0.0001)
             attempt += 1
         
         else: 
@@ -165,7 +165,7 @@ def send_chunk_info(nrf: NRF24, subchunk_num, chunk_id):
 
         if not ack_received:
             print("  * ACK for chunk info frame not received. Retrying transmission. Attempt: " + str(attempt))
-            time.sleep(0.1)
+            time.sleep(0.0001)
             attempt += 1
         
         else: 
@@ -197,7 +197,7 @@ def send_subchunk(nrf: NRF24, subchunk):
 
         if not ack_received:
             print("  * ACK for data frame not received. Retrying transmission. Attempt: " + str(attempt))
-            time.sleep(0.1)
+            time.sleep(0.0001)
             attempt += 1
         
         else: 
