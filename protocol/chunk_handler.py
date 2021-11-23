@@ -56,7 +56,7 @@ def main():
     chunks = decompress_chunks(compressed_chunks)
     print("Number of decompressed chunks: " + str(len(chunks)))
     print("Size of chunk: " + str(len(chunks[2])))
-    file = open("test.txt", "wb")
+    file = open("data/test.txt", "wb")
     for chunk in chunks:
         file.write(chunk)
     file.close()
