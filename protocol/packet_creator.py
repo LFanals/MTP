@@ -24,7 +24,9 @@ def zero_padd_list(list, N):
 
 def create_hello_frame(chunk_amount):
     print("Creating Hello Frame")
-    frame = [HELLO_PREFIX, chunk_amount]
+    
+    b_chunk_amount = chunk_amount.to_bytes(2, 'little')
+    frame = [HELLO_PREFIX, b_chunk_amount[0], b_chunk_amount[1]]
     frame = zero_padd_list(frame, SUBCHUNK_SIZE)
     frame = bytearray(frame)
     return frame
@@ -34,8 +36,8 @@ def create_chunk_info_frame(subchunk_amount, chunk_id):
     print("Creating Chunk Info Frame")
     # TODO: Re-implement this function to ensure two bytes for amount
     # It will break if subchunk amount is bigger than 255
-
-    frame = [CHUNK_INFO_PREFIX, subchunk_amount, chunk_id]
+    b_subchunk_amount = subchunk_amount.to_bytes(2, 'little')
+    frame = [CHUNK_INFO_PREFIX, b_subchunk_amount[0], b_subchunk_amount[1], chunk_id]
     frame = zero_padd_list(frame, SUBCHUNK_SIZE)
     frame = bytearray(frame)
     return frame

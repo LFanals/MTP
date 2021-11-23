@@ -15,6 +15,7 @@ import sys
 
 def start_sender():
     print("Starting sender")
+    time_start = time.time()
 
     # Setup nrf24 sender
     nrf = setup_sender()
@@ -26,7 +27,7 @@ def start_sender():
     filename = get_file_from_working_dir()
 
     # Get file chunks
-    chunks = chunk_handler.get_file_chunks(filename, 2)
+    chunks = chunk_handler.get_file_chunks(filename, 10)
     subchunks = packet_creator.create_data_frames(chunks)
 
     # Send Hello frame
@@ -61,6 +62,8 @@ def start_sender():
                 else:
                     ready = True
     print("Reached end of program. In theory all data has been sent correctly")
+    time_end = time.time()
+    print("Time elapsed: " + str(time_end - time_start))
 
 def get_file_from_working_dir() -> str:
 
