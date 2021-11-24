@@ -50,7 +50,7 @@ def start_sender():
             if not send_chunk_info(nrf, subchunk_num, chunk_id):
                 # Receiver is not ready yet or the ack has been lost. Wait and try again
                 print("Positive ack not received to chunk_info frame, sending again...")
-                time.sleep()
+                time.sleep(constants.RETRY_DELAY)
             else:
                 ready = True
         # Receiver is ready to receive the data frames
