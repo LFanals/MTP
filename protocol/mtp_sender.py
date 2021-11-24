@@ -101,7 +101,7 @@ def create_sender_nrf(pi, address):
     # PLEASE NOTE: PA level is set to MIN, because test sender/receivers are often close to each other, and then MIN works better.
     nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.ACK, channel=constants.CHANNEL, data_rate=constants.DATA_RATE, pa_level=constants.PA_LEVEL)
     nrf.set_address_bytes(len(address))
-    nrf.set_retransmission(15, 15)
+    nrf.set_retransmission(1, 15)
     nrf.open_writing_pipe(address)
     
     # Display the content of the nrf24 device registers.
