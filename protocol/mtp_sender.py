@@ -10,7 +10,7 @@ import constants
 # General imports
 import subprocess
 import time
-import datetime
+from datetime import datetime
 import os
 import sys
 import ioparent
