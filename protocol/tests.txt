@@ -60,3 +60,22 @@ COMPRESSION_LEVEL = 9
 filesize = 182KB
 time: PETA
 
+CHANNEL = 100
+DATA_RATE = RF24_DATA_RATE.RATE_250KBPS
+PA_LEVEL = RF24_PA.HIGH
+RETRY_DELAY = 0.0001
+CHUNK_SIZE = 200
+PAYLOAD_SIZE = RF24_PAYLOAD.ACK
+SPI_SPEED = 1e6
+COMPRESSION_LEVEL = 6
+filesize = 182KB
+time: 22s
+
+# TODO: 
+- detalls LEDs
+- Arreglar decompressió
+- Contabilitzar retries a nivell de payload (son molts?)
+- Testejar amb simple sender i receiver 
+- 
+
+
