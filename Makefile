@@ -11,4 +11,4 @@ push:
 
 pull:
 	git pull
-	python3 protocol/main.py
+	cd protocol && python3 main.py
