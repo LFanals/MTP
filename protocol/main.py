@@ -10,6 +10,12 @@ def main():
     
     # Get transmitter or receiver arguments
     ioparent.config()
+    ioparent.control_led(1, False)
+    ioparent.control_led(2, False)
+    ioparent.control_led(3, False)
+    ioparent.control_led(4, False)
+    ioparent.control_led(5, False)
+
     while (ioparent.is_master_on() == False):
         sleep(0.1)  
 

@@ -40,7 +40,7 @@ def start_receiver():
         # LEDs 3, 4 and 5 will indicate the received percentage
         if i > 2*num_chunks/3: 
             ioparent.control_led(4, True)
-        elif i == num_chunks:
+        elif i > num_chunks - 1:
             ioparent.control_led(5, True)
 
 
