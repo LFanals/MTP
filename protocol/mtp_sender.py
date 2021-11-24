@@ -61,6 +61,10 @@ def start_sender():
                     time.sleep(0.0001)
                 else:
                     ready = True
+        if not send_chunk_is_good(nrf, chunk_id):
+            # Receiver needs to receive the chunk again
+            print("Chunk was not good, sending again chunk with id: " + chunk_id)
+            chunk_id = chunk_id - 1
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))
@@ -204,6 +208,37 @@ def send_subchunk(nrf: NRF24, subchunk):
             attempt = 0
 
     return is_ack_positive(ack_payload)
+
+def send_chunk_is_good(nrf: NRF24, chunk_id: int):
+    print("Asking if chunk has been good")
+
+    payload = packet_creator.create_chunk_is_good_frame(chunk_id)
+    attempt = 1
+    while attempt:
+        if not send(nrf, payload):
+            # TODO: Handle case when timeout is exceeded
+            print("  * Timeout sending data frame. Retrying transmission. Attempt: " + str(attempt))
+            attempt += 1
+
+        # Get ACK
+        # if is_package_lost(nrf):
+        #     # TODO: Handle package is lost
+        #     print("  * Data frame lost. Retrying transmission. Attempt: " + str(attempt))
+        #     attempt += 1
+
+        # Check if ACK is positive
+        (ack_received, ack_payload) = get_ack_payload(nrf)
+
+        if not ack_received:
+            print("  * ACK for data frame not received. Retrying transmission. Attempt: " + str(attempt))
+            time.sleep(0.0001)
+            attempt += 1
+        
+        else: 
+            attempt = 0
+
+    return is_ack_positive(ack_payload)
+
 
 def send(nrf: NRF24, payload) -> bool:
     # Sends the a packet and waits until it is sent
