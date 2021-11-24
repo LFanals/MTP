@@ -8,7 +8,8 @@ from nrf24 import *
 import constants
 
 # general imports
-import time, datetime
+import time
+from datetime import datetime
 import sys
 import os
 import subprocess
