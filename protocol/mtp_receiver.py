@@ -8,11 +8,19 @@ from nrf24 import *
 # general imports
 import time
 import sys
+import os
+import subprocess
 
 def start_receiver():
     print("Starting receiver")
+
     # Setup nrf24
     nrf = setup_receiver()
+
+    # Clean working directory
+    filename = os.path.join(p_utils.WORKING_DIR, "received.txt")
+    print("File to be received: " + filename)
+    clean_working_dir(filename)
 
     # Wait for Hello frame
     (is_hello, num_chunks) = wait_hello(nrf)
@@ -56,7 +64,12 @@ def start_receiver():
         # All subchunks of chunk have been received. Decompress and save to file
         # for testing purposes we just print it to console
         print("------------chunk id: " + str(chunk_id) + "----------------")
-        print(chunk_handler.decompress_chunk(chunk_data))
+        decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
+        # print(decompressed_chunk)
+        write_chunk_to_file(filename, decompressed_chunk)        
+
+    print("All data has been received correctly, copying file to usb")
+    subprocess.call("./write_usb.sh")
 
 
 def setup_receiver():
@@ -77,7 +90,7 @@ def create_receiver_nrf(pi, address):
     # Create NRF24 object.
     # PLEASE NOTE: PA level is set to MIN, because test sender/receivers are often close to each other, and then MIN works better.
     # ALSO NOTE: pauload size is set to ACK. That means that payload is variable and acks can contain payload as well
-    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.ACK, channel=100, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.MIN)
+    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.ACK, channel=100, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.HIGH)
     nrf.set_address_bytes(len(address))
 
     # Listen on the address specified as parameter
@@ -156,4 +169,16 @@ def set_next_ack(nrf: NRF24, positive):
 def wait_data(nrf: NRF24):
     print("Waiting for new data...")
     while not nrf.data_ready():
-        time.sleep(0.01)
+        time.sleep(0.0001)
+
+def clean_working_dir(filename):
+    try:
+        os.remove(filename)
+    except:
+        # Directory already clean
+        return
+
+def write_chunk_to_file(filename, chunk):
+    f = open(filename, "ab")
+    f.write(chunk)
+    f.close()

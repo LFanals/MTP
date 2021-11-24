@@ -1,8 +1,10 @@
 # General imports
 import pigpio
 import sys
+from os.path import expanduser
 
 ADDRESS = "MTPC"
+WORKING_DIR = expanduser("~") + "/working-directory"
 
 def connect_to_gpio(hostname, port):
     # Connect to pigpiod
