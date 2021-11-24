@@ -82,6 +82,7 @@ def start_receiver():
         write_chunk_to_file(filename, decompressed_chunk)        
 
     print("All data has been received correctly, copying file to usb")
+    ioparent.control_led(0, False)
     subprocess.call("./write_usb.sh")
 
 
