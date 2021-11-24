@@ -3,11 +3,12 @@ from mtp_receiver import start_receiver
 from mtp_sender import start_sender
 import ioparent
 from time import sleep
+import os
 
 def main():
     
     chunk_size = 80
-    
+    os.system("sudo pigpiod")
     # Get transmitter or receiver arguments
     ioparent.config()
     ioparent.control_led(1, False)
