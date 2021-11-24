@@ -157,20 +157,20 @@ def wait_chunk_info(nrf: NRF24):
     return (True, subchunks_num, chunk_id)
 
 def wait_data_frame(nrf: NRF24):
-    print("")
-    print("ENTERING wait_data_frame: ", datetime.now())
+    # print("")
+    # print("ENTERING wait_data_frame: ", datetime.now())
     # Set a positive payload for the next ack
     set_next_ack(nrf, True)
-    print("ACK SET: ", datetime.now())
+    # print("ACK SET: ", datetime.now())
 
     wait_data(nrf)
-    print("DATA RECEIVED", datetime.now())
+    # print("DATA RECEIVED", datetime.now())
     # Data is available, check it is data frame
     payload = nrf.get_payload()
     if payload[0] != 0x02:
         print("Frame received is not a data frame: payload[0] = " + str(payload[0]))
         return (False, -1)
-    print("PAYLOAD READ: ", datetime.now())
+    # print("PAYLOAD READ: ", datetime.now())
 
     # Get data (bytes from position 1 until end)
     data = payload[1:32]

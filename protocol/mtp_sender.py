@@ -214,8 +214,8 @@ def send_subchunk(nrf: NRF24, subchunk):
 def send(nrf: NRF24, payload) -> bool:
     # Sends the a packet and waits until it is sent
     # If timeout exideed returns False, True otherwise
-    print("")
-    print("BEFORE SEND: ", datetime.now())
+    # print("")
+    # print("BEFORE SEND: ", datetime.now())
     nrf.reset_packages_lost()
     nrf.send(payload)
 
@@ -226,7 +226,7 @@ def send(nrf: NRF24, payload) -> bool:
     # except TimeoutError:
     #     print("Timeout exceeded to send a packet")
     #     timeout = True
-    print("AFTER SEND: ", datetime.now())
+    # print("AFTER SEND: ", datetime.now())
     return not timeout
 
 def get_ack_payload(nrf: NRF24):
