@@ -102,7 +102,7 @@ def create_receiver_nrf(pi, address):
     # Create NRF24 object.
     # PLEASE NOTE: PA level is set to MIN, because test sender/receivers are often close to each other, and then MIN works better.
     # ALSO NOTE: pauload size is set to ACK. That means that payload is variable and acks can contain payload as well
-    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.ACK, channel=constants.CHANNEL, data_rate=constants.DATA_RATE, pa_level=constants.PA_LEVEL)
+    nrf = NRF24(pi, ce=25, payload_size=constants.PAYLOAD_SIZE, channel=constants.CHANNEL, data_rate=constants.DATA_RATE, pa_level=constants.PA_LEVEL)
     nrf.set_address_bytes(len(address))
 
     # Listen on the address specified as parameter
