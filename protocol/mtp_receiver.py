@@ -8,7 +8,7 @@ from nrf24 import *
 import constants
 
 # general imports
-import time
+import time, datetime
 import sys
 import os
 import subprocess
@@ -155,7 +155,8 @@ def wait_chunk_info(nrf: NRF24):
     return (True, subchunks_num, chunk_id)
 
 def wait_data_frame(nrf: NRF24):
-
+    print("")
+    print("BEFORE RECEIVE: ", datetime.now())
     # Set a positive payload for the next ack
     set_next_ack(nrf, True)
     wait_data(nrf)
@@ -168,7 +169,7 @@ def wait_data_frame(nrf: NRF24):
 
     # Get data (bytes from position 1 until end)
     data = payload[1:32]
-    
+    print("AFTER RECEIVE: ", datetime.now())
     return (True, data)
 
 def set_next_ack(nrf: NRF24, positive):
