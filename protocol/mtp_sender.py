@@ -12,10 +12,12 @@ import subprocess
 import time
 import os
 import sys
+import ioparent
 
 
-def start_sender():
+def start_sender(chunk_size):
     print("Starting sender")
+    ioparent.control_led(1, True)
     time_start = time.time()
 
     # Setup nrf24 sender
@@ -65,6 +67,7 @@ def start_sender():
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))
+    ioparent.control_led(1, False)
 
 def get_file_from_working_dir() -> str:
 
