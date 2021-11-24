@@ -179,7 +179,7 @@ def set_next_ack(nrf: NRF24, positive):
         nrf.ack_payload(RF24_RX_ADDR.P1, bytes([0]))
 
 def wait_data(nrf: NRF24):
-    print("Waiting for new data...")
+    # print("Waiting for new data...")
     while not nrf.data_ready():
         time.sleep(constants.RETRY_DELAY)
 

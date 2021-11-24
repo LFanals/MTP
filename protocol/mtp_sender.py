@@ -181,7 +181,7 @@ def send_subchunk(nrf: NRF24, subchunk):
     # Sends a subchunk data frame, waits for the ack
     # If everything is successful returns true
 
-    print("Sending data frame")
+    # print("Sending data frame")
     
     attempt = 1
     while attempt:
@@ -248,7 +248,7 @@ def is_package_lost(nrf: NRF24):
 
 def is_ack_positive(ack_payload):
     if ack_payload[0] == 1:
-        print("Checking ack -> Positive")
+        # print("Checking ack -> Positive")
         return True
 
     print("Checking ack -> Negative")
