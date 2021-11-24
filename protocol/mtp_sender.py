@@ -50,6 +50,7 @@ def start_sender(chunk_size):
         ready = False
         while not ready:
             if not send_chunk_info(nrf, subchunk_num, chunk_id):
+                # TODO: delete this while
                 # Receiver is not ready yet or the ack has been lost. Wait and try again
                 print("Positive ack not received to chunk_info frame, sending again...")
                 time.sleep(constants.RETRY_DELAY)
@@ -218,11 +219,11 @@ def send(nrf: NRF24, payload) -> bool:
 
     # Wait for transmission to complete.
     timeout = False
-    try:
-        nrf.wait_until_sent()
-    except TimeoutError:
-        print("Timeout exceeded to send a packet")
-        timeout = True
+    # try:
+    #     nrf.wait_until_sent()
+    # except TimeoutError:
+    #     print("Timeout exceeded to send a packet")
+    #     timeout = True
     return not timeout
 
 def get_ack_payload(nrf: NRF24):
