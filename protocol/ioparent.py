@@ -66,7 +66,7 @@ def read_switches():
 
     iiSW1 = GPIO.input(SW1)
     iiSW2 = GPIO.input(SW2)
-    iiSW3 = GPIO.input(SW2)
+    iiSW3 = GPIO.input(SW3)
     iiSW4 = GPIO.input(SW4)
     iiSW5 = GPIO.input(SW5)
 
@@ -75,7 +75,7 @@ def read_switches():
     if (iSW1 == iiSW1 and iSW2 == iiSW2 and iSW3 == iiSW3 and iSW4 == iiSW4 and iSW5 == iiSW5):
         return True, [iSW1, iSW2, iSW3, iSW4, iSW5] 
     else:
-        return False, [0, 0, 0, 0, 0]
+        return False, [iSW1, iSW2, iSW3, iSW4, iSW5]
 
 
 def is_master_on():
