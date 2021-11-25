@@ -16,7 +16,7 @@ import sys
 import ioparent
 
 
-def start_sender(chunk_size):
+def start_sender():
     print("Starting sender")
     ioparent.control_led(1, True)
     time_start = time.time()
