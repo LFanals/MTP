@@ -194,7 +194,7 @@ def wait_data_frame(nrf: NRF24):
 
 def wait_chunk_is_good(nrf: NRF24, good: bool): 
 
-    set_next_ack(nrf, good)
+    set_next_ack(nrf, False)
     wait_data(nrf)
 
     # Data is available, check it is chunk_info frame
