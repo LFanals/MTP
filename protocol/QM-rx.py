@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     # Create NRF24 object.
     # PLEASE NOTE: PA level is set to MIN, because test sender/receivers are often close to each other, and then MIN works better.
-    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.DYNAMIC, channel=126, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.HIGH, spi_speed=1e6)
+    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.DYNAMIC, channel=125, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.HIGH, spi_speed=1e6)
     nrf.set_address_bytes(len(address))
 
     # Listen on the address specified as parameter
