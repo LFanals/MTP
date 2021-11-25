@@ -95,7 +95,7 @@ if __name__ == "__main__":
                         received = a
                     else:
                         received += a
-                    print(received)
+                    # print(received)
                     if (received[-3:] == b'\x25\x40\x26'):
                     # if (count % 2 == 0 and count==320):
                         print(received)

@@ -69,6 +69,8 @@ if __name__ == "__main__":
     datae = data + b'\x25\x40\x26'
 
     i = 0 
+    n_success = 0
+    n_fail = 0
     try:
         print(f'Send to {address}')
         count = 0
@@ -94,9 +96,12 @@ if __name__ == "__main__":
                 continue
             
             if nrf.get_packages_lost() == 0:
-                print(f"Success: lost={nrf.get_packages_lost()}, retries={nrf.get_retries()}")
+                # print(f"Success: lost={nrf.get_packages_lost()}, retries={nrf.get_retries()}")
+                n_success += 1
             else:
-                print(f"Error: lost={nrf.get_packages_lost()}, retries={nrf.get_retries()}")
+                # print(f"Error: lost={nrf.get_packages_lost()}, retries={nrf.get_retries()}")
+                n_fail += 1
+                print("total success: ", str(n_success), ", total fail: ", str(n_fail))
 
             # Wait 10 seconds before sending the next reading.
             # time.sleep(0.01)
