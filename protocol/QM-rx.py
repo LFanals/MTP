@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     # Create NRF24 object.
     # PLEASE NOTE: PA level is set to MIN, because test sender/receivers are often close to each other, and then MIN works better.
-    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.DYNAMIC, channel=27, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.MIN)
+    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.DYNAMIC, channel=27, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.MIN, spi_speed=1e6)
     nrf.set_address_bytes(len(address))
 
     # Listen on the address specified as parameter
@@ -62,6 +62,7 @@ if __name__ == "__main__":
     try:
         print(f'Receive from {address}')
         count = 0
+        t_start = time.time()
         while flag:
 
             # As long as data is ready for processing, process it.
@@ -85,6 +86,8 @@ if __name__ == "__main__":
                 # If the length of the message is 9 bytes and the first byte is 0x01, then we try to interpret the bytes
                 # sent as an example message holding a temperature and humidity sent from the "simple-sender.py" program.
                 n = 31
+                t_end = time.time()
+                print("time: ", str(t_end - t_start))
                 if len(payload) == n+1 and payload[0] == 0x01:
                     values = struct.pack("<"+"B"*(n+1), *payload)
                     # print(values)
