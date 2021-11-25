@@ -66,6 +66,7 @@ def start_sender():
                     time.sleep(constants.RETRY_DELAY)
                 else:
                     ready = True
+        print("Sended last subchunk, about to enter in send chunk is good")
         if not send_chunk_is_good(nrf, chunk_id):
             # Receiver needs to receive the chunk again
             print("Chunk was not good, sending again chunk with id: " + chunk_id)
