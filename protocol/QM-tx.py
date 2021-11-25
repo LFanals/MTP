@@ -52,7 +52,7 @@ if __name__ == "__main__":
     # Display the content of NRF24L01 device registers.
     nrf.show_registers()
 
-    os.system("bash /home/pi/read_usb.sh")
+    os.system("bash /home/pi/MTP/usb/read_usb.sh")
 
     os.chdir(r'/home/pi/working-directory/')
     myFiles = glob.glob('*.txt')
@@ -64,40 +64,23 @@ if __name__ == "__main__":
     data = infile.read()
     infile.close
 
-    # print(data)
-    # data = data + '%@&'
-    # print(data)
-    print(data)
+    print(len(data))
     print(type(data))
-    data = data + b'\x25\x40\x26'
-    print(data)
-    datae = data
-
-    # datae = data.encode("utf-32")
-    # print(datae)
+    datae = data + b'\x25\x40\x26'
 
     i = 0 
-
     try:
         print(f'Send to {address}')
         count = 0
         while i<len(datae):
 
-            # Emulate that we read temperature and humidity from a sensor, for example
-            # a DHT22 sensor.  Add a little random variation so we can see that values
-            # sent/received fluctuate a bit.
-            temperature = normalvariate(23.0, 0.5)
-            print(f'Sensor values: temperature={temperature}')
+            n = 31
+            payload = struct.pack("<"+"B"*(n+1), 0x01, *datae[i:i+n])
+            i += n
 
-            # Pack temperature and humidity into a byte buffer (payload) using a protocol 
-            # signature of 0x01 so that the receiver knows that the bytes we are sending 
-            # are a temperature and a humidity (see "simple-receiver.py").
-            temperature = datae[i]
-            i += 1
-
-            print(f'Sensor values: temperature={temperature}')
-
-            payload = struct.pack("<BB", 0x01, temperature)
+            # vec = struct.pack("<"+"B"*n, *datae[i:i+n])
+            # print(vec)
+            # payload = struct.pack("<BB", 0x01, temperature)
 
             # Send the payload to the address specified above.
             nrf.reset_packages_lost()

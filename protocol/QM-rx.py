@@ -84,9 +84,11 @@ if __name__ == "__main__":
 
                 # If the length of the message is 9 bytes and the first byte is 0x01, then we try to interpret the bytes
                 # sent as an example message holding a temperature and humidity sent from the "simple-sender.py" program.
-                if len(payload) == 2 and payload[0] == 0x01:
-                    values = struct.unpack("<BB", payload)
-                    # print(f'Protocol: {values[0]}, temperature: {values[1]}, humidity: {values[2]}')
+                n = 31
+                if len(payload) == n+1 and payload[0] == 0x01:
+                    values = struct.pack("<"+"B"*n, *payload)
+                    print(values)
+                    # values = struct.unpack("<BB", payload)
                     a = (int(values[1]).to_bytes(1, 'little'))
                     if (count == 1):
                         received = a
