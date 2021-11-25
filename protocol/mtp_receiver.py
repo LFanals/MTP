@@ -194,13 +194,15 @@ def wait_data_frame(nrf: NRF24):
 
 def wait_chunk_is_good(nrf: NRF24, good: bool): 
 
-    set_next_ack(nrf, False)
     wait_data(nrf)
 
     # Data is available, check it is chunk_info frame
     payload = nrf.get_payload()
     if payload[0] != 3:
         print("Frame received is not a chunk_is_good frame: payload[0] = " + str(payload[0]))
+        if payload[0] == 2:
+            print("Received data frame returning true")
+            set_next_ack(nrf, True)
         return (False, -1)
 
     # Get the chunk id
@@ -210,6 +212,7 @@ def wait_chunk_is_good(nrf: NRF24, good: bool):
 
     # Set a positive payload for the next ack
     print("Setting next ack to negative. For testing purposes")
+    set_next_ack(nrf, False)
     
     return (True, chunk_id)
 
