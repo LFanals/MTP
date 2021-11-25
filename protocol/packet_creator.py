@@ -5,7 +5,8 @@ import sys
 
 HELLO_PREFIX = 0
 CHUNK_INFO_PREFIX = 1
-DATA_PREFIX = b'\x02'
+DATA_PREFIX = 2
+CHUNK_IS_GOOD_PREFIX = 3
 SUBCHUNK_SIZE = 31
 PAYLOAD_SIZE = 32
 
@@ -38,6 +39,14 @@ def create_chunk_info_frame(subchunk_amount, chunk_id):
     # It will break if subchunk amount is bigger than 255
     b_subchunk_amount = subchunk_amount.to_bytes(2, 'little')
     frame = [CHUNK_INFO_PREFIX, b_subchunk_amount[0], b_subchunk_amount[1], chunk_id]
+    frame = zero_padd_list(frame, SUBCHUNK_SIZE)
+    frame = bytearray(frame)
+    return frame
+
+def create_chunk_is_good_frame(chunk_id):
+    print("Creating Chunk_Is_Good Frame for chunk id: "+chunk_id)
+    b_chunk_id = chunk_id.to_bytes(2, 'little')
+    frame = [CHUNK_IS_GOOD_PREFIX, b_chunk_id[0], b_chunk_id[1]]
     frame = zero_padd_list(frame, SUBCHUNK_SIZE)
     frame = bytearray(frame)
     return frame

@@ -74,12 +74,30 @@ def start_receiver():
         
         # We don't set the following ack to positive to ensure that sender waits until decompression and writing is finished
 
-        # All subchunks of chunk have been received. Decompress and save to file
-        # for testing purposes we just print it to console
+        # All subchunks of chunk have been received. If decompression is good save to file, if not ask to send again chunk 
         print("------------chunk id: " + str(chunk_id) + "----------------")
-        decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
-        # print(decompressed_chunk)
-        write_chunk_to_file(filename, decompressed_chunk)        
+        good = True
+        try:    
+            decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
+        except:
+            # Decompression failed -> Chunk has errors, ask to retransmit chunk
+            good = False
+
+        (is_chunk_is_good, chunk_id) = wait_chunk_is_good(nrf, good)
+        if not is_chunk_is_good:
+            # TODO handle case when received packet is not a chunk_is_good frame
+            sys.exit()
+        if chunk_id != i:
+            # TODO handle case when chunk_is_good is refering to another chunk id
+            print("Received chunk_is_good from another id -> Expected id: " + str(i) + ", Received id: " + str(chunk_id) + ". Aborting...")
+            sys.exit()
+
+        if not good:
+            # We expect to receive again last frame
+            i = i - 1
+        else:
+            # Chunk was good we write it to file
+            write_chunk_to_file(filename, decompressed_chunk)     
 
     print("All data has been received correctly, copying file to usb")
 #    ioparent.control_led(0, False)
@@ -175,6 +193,27 @@ def wait_data_frame(nrf: NRF24):
     # Get data (bytes from position 1 until end)
     data = payload[1:32]
     return (True, data)
+
+def wait_chunk_is_good(nrf: NRF24, good: bool): 
+
+    wait_data(nrf)
+
+    # Data is available, check it is chunk_info frame
+    payload = nrf.get_payload()
+    if payload[0] != 3:
+        print("Frame received is not a chunk info frame: payload[0] = " + str(payload[0]))
+        return (False)
+
+    # Get the chunk id
+    chunk_id = int.from_bytes([payload[1], payload[2]], "little")
+
+    print("Chunk_is_good Frame received -> chunk_id : " + str(chunk_id))
+
+    # Set a positive payload for the next ack
+    print("Setting next ack to negative. For testing purposes")
+    set_next_ack(nrf, False)
+    
+    return (True, chunk_id)
 
 def set_next_ack(nrf: NRF24, positive):
     if positive:
