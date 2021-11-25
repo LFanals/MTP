@@ -8,6 +8,7 @@ import traceback
 
 import pigpio
 from nrf24 import *
+import math
 
 import os
 import glob
@@ -45,7 +46,7 @@ if __name__ == "__main__":
 
     # Create NRF24 object.
     # PLEASE NOTE: PA level is set to MIN, because test sender/receivers are often close to each other, and then MIN works better.
-    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.DYNAMIC, channel=27, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.MIN)
+    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.DYNAMIC, channel=27, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.MIN, spi_speed=1e6)
     nrf.set_address_bytes(len(address))
     nrf.open_writing_pipe(address)
     
@@ -66,7 +67,7 @@ if __name__ == "__main__":
 
     print(len(data))
     print(type(data))
-    datae = data + b'\x25\x40\x26'
+    datae = data[:math.floor(len(data)/31)*31-3] + b'\x25\x40\x26'
 
     i = 0 
     n_success = 0
@@ -74,6 +75,7 @@ if __name__ == "__main__":
     try:
         print(f'Send to {address}')
         count = 0
+        t_start = time.time()
         while i<len(datae):
 
             n = 31
@@ -101,9 +103,11 @@ if __name__ == "__main__":
             else:
                 # print(f"Error: lost={nrf.get_packages_lost()}, retries={nrf.get_retries()}")
                 n_fail += 1
-                print("total success: ", str(n_success), ", total fail: ", str(n_fail))
+                # print("total success: ", str(n_success), ", total fail: ", str(n_fail))
 
+            t_end = time.time()
             # Wait 10 seconds before sending the next reading.
+            print("total success: ", str(n_success), ", total fail: ", str(n_fail), "time: ", str(- t_start + t_end))
             # time.sleep(0.01)
     except:
         traceback.print_exc()
