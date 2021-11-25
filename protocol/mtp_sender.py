@@ -257,3 +257,7 @@ def is_ack_positive(ack_payload):
 
     print("Checking ack -> Negative")
     return False
+
+
+if __name__ == "__main__":
+    start_sender()
