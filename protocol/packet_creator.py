@@ -44,7 +44,7 @@ def create_chunk_info_frame(subchunk_amount, chunk_id):
     return frame
 
 def create_chunk_is_good_frame(chunk_id):
-    print("Creating Chunk_Is_Good Frame for chunk id: "+chunk_id)
+    print("Creating Chunk_Is_Good Frame for chunk id: "+str(chunk_id))
     b_chunk_id = chunk_id.to_bytes(2, 'little')
     frame = [CHUNK_IS_GOOD_PREFIX, b_chunk_id[0], b_chunk_id[1]]
     frame = zero_padd_list(frame, SUBCHUNK_SIZE)
