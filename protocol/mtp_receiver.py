@@ -1,7 +1,7 @@
 # local imports 
 import protocol_utils as p_utils
 import chunk_handler
-import ioparent
+#import ioparent
 
 # nrf24 library import
 from nrf24 import *
@@ -32,16 +32,16 @@ def start_receiver():
         sys.exit()
     
     # At this point a positive ack has been sent
-    ioparent.control_led(1, True)
-    ioparent.control_led(3, True)
+#    ioparent.control_led(1, True)
+#    ioparent.control_led(3, True)
 
     for i in range(num_chunks):
         
         # LEDs 3, 4 and 5 will indicate the received percentage
-        if i > 2*num_chunks/3: 
-            ioparent.control_led(4, True)
-        elif i >= num_chunks - 1:
-            ioparent.control_led(5, True)
+#        if i > 2*num_chunks/3: 
+#            ioparent.control_led(4, True)
+#        elif i >= num_chunks - 1:
+#            ioparent.control_led(5, True)
 
 
         chunk_data = bytearray()
@@ -82,7 +82,7 @@ def start_receiver():
         write_chunk_to_file(filename, decompressed_chunk)        
 
     print("All data has been received correctly, copying file to usb")
-    ioparent.control_led(0, False)
+#    ioparent.control_led(0, False)
     subprocess.call("./write_usb.sh")
 
 
