@@ -82,15 +82,13 @@ def start_receiver():
         except:
             # Decompression failed -> Chunk has errors, ask to retransmit chunk
             good = False
-
-        (is_chunk_is_good, chunk_id) = wait_chunk_is_good(nrf, good)
-        if not is_chunk_is_good:
-            # TODO handle case when received packet is not a chunk_is_good frame
-            sys.exit()
-        if chunk_id != i:
-            # TODO handle case when chunk_is_good is refering to another chunk id
-            print("Received chunk_is_good from another id -> Expected id: " + str(i) + ", Received id: " + str(chunk_id) + ". Aborting...")
-            sys.exit()
+        is_chunk_is_good = False
+        chunk_id = i
+        while (not is_chunk_is_good) or chunk_id != i:
+            (is_chunk_is_good, chunk_id) = wait_chunk_is_good(nrf, good)
+            if chunk_id != i:
+                # TODO handle case when chunk_is_good is refering to another chunk id
+                print("Received id in chunk_is_good is from another id -> Expected id: " + str(i) + ", Received id: " + str(chunk_id))
 
         if not good:
             # We expect to receive again last frame
@@ -201,8 +199,8 @@ def wait_chunk_is_good(nrf: NRF24, good: bool):
     # Data is available, check it is chunk_info frame
     payload = nrf.get_payload()
     if payload[0] != 3:
-        print("Frame received is not a chunk info frame: payload[0] = " + str(payload[0]))
-        return (False)
+        print("Frame received is not a chunk_is_good frame: payload[0] = " + str(payload[0]))
+        return (False, -1)
 
     # Get the chunk id
     chunk_id = int.from_bytes([payload[1], payload[2]], "little")
