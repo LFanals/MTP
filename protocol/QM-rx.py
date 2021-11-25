@@ -86,7 +86,7 @@ if __name__ == "__main__":
                 # sent as an example message holding a temperature and humidity sent from the "simple-sender.py" program.
                 n = 31
                 if len(payload) == n+1 and payload[0] == 0x01:
-                    values = struct.pack("<"+"B"*n, *payload)
+                    values = struct.pack("<"+"B"*(n+1), *payload)
                     print(values)
                     # values = struct.unpack("<BB", payload)
                     a = (int(values[1]).to_bytes(1, 'little'))
