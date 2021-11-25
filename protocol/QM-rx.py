@@ -87,9 +87,10 @@ if __name__ == "__main__":
                 n = 31
                 if len(payload) == n+1 and payload[0] == 0x01:
                     values = struct.pack("<"+"B"*(n+1), *payload)
-                    print(values)
+                    # print(values)
                     # values = struct.unpack("<BB", payload)
-                    a = (int(values[1]).to_bytes(1, 'little'))
+                    # a = (int(values[1]).to_bytes(1, 'little'))
+                    a = values[1:]
                     if (count == 1):
                         received = a
                     else:
