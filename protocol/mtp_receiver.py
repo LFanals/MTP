@@ -234,7 +234,6 @@ def wait_chunk_is_good(nrf: NRF24, good: bool, id: int):
 
 def set_next_ack(nrf: NRF24, positive, type: int, id: int):
     if positive:
-        nrf.set_payload_size()
         nrf.ack_payload(RF24_RX_ADDR.P1, "Hola")
     else:
         nrf.ack_payload(RF24_RX_ADDR.P1, "Hola")
