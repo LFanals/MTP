@@ -70,7 +70,7 @@ def start_receiver():
             chunk_data.extend(data)
         
         # All subchunks of chunk have been received. If decompression is good save to file, if not ask to send again chunk 
-        print("------------chunk id: " + str(chunk_id) + "----------------")
+        print("------------chunk id: " + str(i) + "----------------")
         chunk_correct = True
         try:    
             decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)

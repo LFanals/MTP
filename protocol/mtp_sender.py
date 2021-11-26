@@ -271,6 +271,7 @@ def send(nrf: NRF24, payload) -> bool:
 
 def get_ack_payload(nrf: NRF24):
     # Check if an acknowledgement package is available.
+    time.sleep(constants.RETRY_DELAY)
     for i in range(constants.ACK_WAIT_TIMEOUT):
         if nrf.data_ready():
             # Get payload.
@@ -278,9 +279,7 @@ def get_ack_payload(nrf: NRF24):
             #print("ACK payload: " + str(payload))
             return (True, payload)
 
-        print("No acknowledgement payload package received. Waiting again...")
-        time.sleep(constants.RETRY_DELAY)
-
+        #print("No acknowledgement payload package received. Waiting again...")
     print("ACK timeout exceeded")
     return (False, -1)
 
