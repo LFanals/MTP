@@ -48,7 +48,6 @@ def create_chunk_is_good_frame(chunk_id):
     b_chunk_id = chunk_id.to_bytes(2, 'little')
     frame = [CHUNK_IS_GOOD_PREFIX, b_chunk_id[0], b_chunk_id[1]]
     frame = zero_padd_list(frame, SUBCHUNK_SIZE)
-    print(frame)
     frame = bytearray(frame)
     return frame
 
@@ -69,6 +68,7 @@ def create_data_frames(chunk_list):
         rts_subchunk_list = []
         for i in range(len(subchunk_list)):
             # Insert "type" prefix at position 0
+            # TODO: Insert as well the subchunk id with the data prefix
             subchunk = bytearray(DATA_PREFIX) + subchunk_list[i]
 
             # 0 padding if necessary

@@ -50,27 +50,31 @@ def start_sender():
         subchunk_num = len(subchunks[chunk_id])
         ready = False
         while not ready:
+            # TODO: Make chunk_id module 255 for the 8 bits
             if not send_chunk_info(nrf, subchunk_num, chunk_id):
                 # TODO: delete this while
                 # Receiver is not ready yet or the ack has been lost. Wait and try again
-                print("Positive ack not received to chunk_info frame, sending again...")
+                print("Received ack doesn't correspond to the sent frame. Sending again...")
                 time.sleep(constants.RETRY_DELAY)
             else:
                 ready = True
         # Receiver is ready to receive the data frames
+        subchunk_id = 0
         for subchunk in subchunks[chunk_id]:
             ready = False
             while not ready:
-                if not send_subchunk(nrf, subchunk):
-                    print("Positive ack not received to data frame, sending again...")
+                if not send_subchunk(nrf, subchunk, subchunk_id):
+                    print("ACK received doesn't correspond to the sended frame, sending again...")
                     time.sleep(constants.RETRY_DELAY)
                 else:
                     ready = True
-        print("Sended last subchunk, about to enter in send chunk is good")
+            subchunk_id = subchunk_id + 1
+
         if not send_chunk_is_good(nrf, chunk_id):
             # Receiver needs to receive the chunk again
-            print("Chunk was not good, sending again chunk with id: " + chunk_id)
+            print("Chunk was not good, sending again chunk with id: " + str(chunk_id))
             chunk_id = chunk_id - 1
+
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))
@@ -136,7 +140,6 @@ def send_hello(nrf: NRF24, chunk_num: int) -> bool:
         #     print("  * Hello frame lost. Retrying transmission. Attempt: " + str(attempt))
         #     attempt += 1
 
-        # Check if ACK is positive
         (ack_received, ack_payload) = get_ack_payload(nrf)
 
         if not ack_received:
@@ -147,8 +150,8 @@ def send_hello(nrf: NRF24, chunk_num: int) -> bool:
         else: 
             attempt = 0
 
-    return is_ack_positive(ack_payload)
-
+    # Hello frame is always type=0 and id=0
+    return check_expected_ack(ack_payload, 0, 0)
 
 def send_chunk_info(nrf: NRF24, subchunk_num, chunk_id):
     # Sends the chunk info frame, waits for the ack and checks that is it positive
@@ -182,9 +185,9 @@ def send_chunk_info(nrf: NRF24, subchunk_num, chunk_id):
         else: 
             attempt = 0
 
-    return is_ack_positive(ack_payload)
+    return check_expected_ack(ack_payload, 1, chunk_id)
 
-def send_subchunk(nrf: NRF24, subchunk):
+def send_subchunk(nrf: NRF24, subchunk, subchunk_id):
     # Sends a subchunk data frame, waits for the ack
     # If everything is successful returns true
 
@@ -203,7 +206,6 @@ def send_subchunk(nrf: NRF24, subchunk):
         #     print("  * Data frame lost. Retrying transmission. Attempt: " + str(attempt))
         #     attempt += 1
 
-        # Check if ACK is positive
         (ack_received, ack_payload) = get_ack_payload(nrf)
 
         if not ack_received:
@@ -214,7 +216,7 @@ def send_subchunk(nrf: NRF24, subchunk):
         else: 
             attempt = 0
 
-    return is_ack_positive(ack_payload)
+    return check_expected_ack(ack_payload, 2, subchunk_id)
 
 def send_chunk_is_good(nrf: NRF24, chunk_id: int):
     print("Asking if chunk has been good")
@@ -233,14 +235,18 @@ def send_chunk_is_good(nrf: NRF24, chunk_id: int):
         #     print("  * Data frame lost. Retrying transmission. Attempt: " + str(attempt))
         #     attempt += 1
 
-        # Check if ACK is positive
         (ack_received, ack_payload) = get_ack_payload(nrf)
 
         if not ack_received:
             print("  * ACK for data frame not received. Retrying transmission. Attempt: " + str(attempt))
             time.sleep(constants.RETRY_DELAY)
             attempt += 1
-        
+            continue
+
+        if not check_expected_ack(ack_payload, 3, chunk_id):
+            attempt += 1
+            continue
+
         else: 
             attempt = 0
 
@@ -265,16 +271,18 @@ def send(nrf: NRF24, payload) -> bool:
 
 def get_ack_payload(nrf: NRF24):
     # Check if an acknowledgement package is available.
-    if nrf.data_ready():
-        # Get payload.
-        payload = nrf.get_payload()
-        #print("ACK payload: " + str(payload))
-        return (True, payload)
+    for i in range(constants.ACK_WAIT_TIMEOUT):
+        if nrf.data_ready():
+            # Get payload.
+            payload = nrf.get_payload()
+            #print("ACK payload: " + str(payload))
+            return (True, payload)
 
-    else:
-        # print("No acknowledgement payload package received.")å
-        # TODO: Handle this case when the ack doesn't arrive 
-        return (False, -1)
+        print("No acknowledgement payload package received. Waiting again...")
+        time.sleep(constants.RETRY_DELAY)
+
+    print("ACK timeout exceeded")
+    return (False, -1)
 
 def is_package_lost(nrf: NRF24):
     # Returns true if package has been lost
@@ -292,6 +300,10 @@ def is_ack_positive(ack_payload):
     print("Checking ack -> Negative")
     return False
 
+def check_expected_ack(ack_payload, type, id):
+    if ack_payload[1] != type or ack_payload[2] != id:
+        print("ACK doesn't correspond to the expected one")
+        return False
 
 if __name__ == "__main__":
     start_sender()

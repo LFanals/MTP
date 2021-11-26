@@ -25,11 +25,12 @@ def start_receiver():
     print("File to be received: " + filename)
     clean_working_dir(filename)
 
-    # Wait for Hello frame
-    (is_hello, num_chunks) = wait_hello(nrf)
-    if not is_hello:
-        # TODO: handle case when first packet received is not a hello frame
-        sys.exit()
+    # Wait for Hello frame until we receive it
+    is_hello = False
+    while not is_hello:
+        (is_hello, num_chunks) = wait_hello(nrf)
+        if not is_hello:
+            print("Waiting again for hello...")
     
     # At this point a positive ack has been sent
 #    ioparent.control_led(1, True)
@@ -45,56 +46,48 @@ def start_receiver():
 
 
         chunk_data = bytearray()
-        # Wait for chunk_info
+        # Wait for chunk_info until we receive a chunk_info packet
         is_chunk_info = False
         while not is_chunk_info:
-            (is_chunk_info, num_subchunks, chunk_id) = wait_chunk_info(nrf)
+            (is_chunk_info, num_subchunks, chunk_id) = wait_chunk_info(nrf, i)
             if not is_chunk_info:
-                # TODO: handle case when second packet received is not a chunk info frame
                 print("Packet received is not a chunk info packet. Waiting again for chunk info packet...")
-                
-        
-        # Check that the chunk that is going to be received corresponds to the chunk expected 
-        if i != chunk_id:
-            print("Chunk doesn't correspond to the expected chunk: expected = " + str(i) + ", received = " + str(chunk_id))
-            # TODO: handle case when chunk received doesn't correspond to the expected one
-            sys.exit()
 
+            # Check that the chunk that is going to be received corresponds to the chunk expected 
+                
+        # Start receiving data  packets of chunk i
         for subchunk_id in range(num_subchunks):
-            (is_data_frame, data) = wait_data_frame(nrf)
-            if not is_data_frame:
-                # TODO: handle case when packet received is not a data frame
-                sys.exit()
+            is_data_frame = False
+            while not is_data_frame:
+                (is_data_frame, data) = wait_data_frame(nrf, subchunk_id)
+                if not is_data_frame:
+                    print("Waiting again for data frame...")
+                # Logging message
+                if (subchunk_id != 0) and (not subchunk_id%10):
+                    print("Received until subchunk " + str(subchunk_id))
             
-            if (subchunk_id is not 0) and (not subchunk_id%10):
-                print("Received until subchunk " + str(subchunk_id))
-            
-            # Add the data to the chunk data bytearray
+            # Data is good. Add the data to the chunk data bytearray
             chunk_data.extend(data)
         
-        # We don't set the following ack to positive to ensure that sender waits until decompression and writing is finished
-
         # All subchunks of chunk have been received. If decompression is good save to file, if not ask to send again chunk 
         print("------------chunk id: " + str(chunk_id) + "----------------")
-        good = True
+        chunk_correct = True
         try:    
             decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
         except:
             # Decompression failed -> Chunk has errors, ask to retransmit chunk
-            good = False
+            chunk_correct = False
         is_chunk_is_good = False
-        chunk_id = i
-        while (not is_chunk_is_good) or chunk_id != i:
-            (is_chunk_is_good, chunk_id) = wait_chunk_is_good(nrf, good)
-            if chunk_id != i:
-                # TODO handle case when chunk_is_good is refering to another chunk id
-                print("Received id in chunk_is_good is from another id -> Expected id: " + str(i) + ", Received id: " + str(chunk_id))
+        while not is_chunk_is_good:
+            is_chunk_is_good = wait_chunk_is_good(nrf, chunk_correct, id)
+            if not is_chunk_info:
+                print("Waiting for chunk_is_good frame again...")
 
-        if not good:
+        if not chunk_correct:
             # We expect to receive again last frame
             i = i - 1
         else:
-            # Chunk was good we write it to file
+            # Chunk was correct we write it to file
             write_chunk_to_file(filename, decompressed_chunk)     
 
     print("All data has been received correctly, copying file to usb")
@@ -134,7 +127,8 @@ def create_receiver_nrf(pi, address):
 def wait_hello(nrf: NRF24):
 
     # Set a positive payload for the next ack
-    set_next_ack(nrf, True)
+    set_next_ack(nrf, True, 0, 0)
+
     wait_data(nrf)
     
     # Data is available, check it is hello frame
@@ -148,51 +142,67 @@ def wait_hello(nrf: NRF24):
 
     return (True, num_chunks)
 
-def wait_chunk_info(nrf: NRF24): 
+def wait_chunk_info(nrf: NRF24, id): 
 
     # Set a positive payload for the next ack
-    set_next_ack(nrf, True)
+    set_next_ack(nrf, True, 1, id)
     wait_data(nrf)
 
     # Data is available, check it is chunk_info frame
     payload = nrf.get_payload()
-    if payload[0] != 0x01:
+    if payload[0] != 1:
         print("Frame received is not a chunk info frame: payload[0] = " + str(payload[0]))
-        return (False, -1, -1)
+        return (False, -1)
 
-    # Get subchunks ammount (bytes at position 1 and 2)
-    #subchunks_num = int.from_bytes(payload[1].to_bytes(1, 'big') + payload[2].to_bytes(1, 'big'), 'big')
-    #chunk_id = payload[3]
-
-    # Temporal workaround while create_chunk_info_frame() is not working properly
+    # Get chunk info data
     subchunks_num = int.from_bytes([payload[1], payload[2]], "little")
     chunk_id = payload[3] 
 
     print("Chunk_info received -> Chunk id: " + str(chunk_id) + ", num of subchunks: " + str(subchunks_num))
-    
-    return (True, subchunks_num, chunk_id)
 
-def wait_data_frame(nrf: NRF24):
-    # print("")
-    # print("ENTERING wait_data_frame: ", datetime.now())
+    # Ensure that the chunk info received corresponds to the one expected
+    if id != chunk_id:
+        print("Chunk doesn't correspond to the expected chunk: expected = " + str(id) + ", received = " + str(chunk_id))
+        return (False, -1)
+
+    return (True, subchunks_num)
+
+def wait_data_frame(nrf: NRF24, id: int):
+    # Returns False if it is not a data frame type or it doesn't correspond to the id expected
+    # If everything alright returns the data
+
     # Set a positive payload for the next ack
-    set_next_ack(nrf, True)
-    # print("ACK SET: ", datetime.now())
+    set_next_ack(nrf, True, 2, id)
 
     wait_data(nrf)
-    # print("DATA RECEIVED", datetime.now())
+
     # Data is available, check it is data frame
+    # Get data type from byte
+
     payload = nrf.get_payload()
-    if payload[0] != 0x02:
+    type = get_type_from_byte(payload[0])
+    received_id = get_id_from_byte(payload[0])
+    if type != 0x02:
         print("Frame received is not a data frame: payload[0] = " + str(payload[0]))
         return (False, -1)
-    # print("PAYLOAD READ: ", datetime.now())
+    
+    if received_id != id: 
+        print("Data received doesn't correspond to data frame id expected: expected = " + str(id) + ", received=" + str(received_id))
+        return (False, -1)
 
     # Get data (bytes from position 1 until end)
     data = payload[1:32]
     return (True, data)
 
-def wait_chunk_is_good(nrf: NRF24, good: bool): 
+def get_type_from_byte(first_b : int):
+    # We return the left 4 bits of the byte -> 10111011 & 11110000 = 10110000
+    return first_b >> 4
+
+def get_id_from_byte(first_b : int):
+    # We return the right 4 bits of the byte -> 10111011 & 00001111 = 00001011
+    return first_b & 15
+
+def wait_chunk_is_good(nrf: NRF24, good: bool, id: int): 
 
     wait_data(nrf)
 
@@ -202,25 +212,28 @@ def wait_chunk_is_good(nrf: NRF24, good: bool):
         print("Frame received is not a chunk_is_good frame: payload[0] = " + str(payload[0]))
         if payload[0] == 2:
             print("Received data frame returning true")
-            set_next_ack(nrf, True)
-        return (False, -1)
+            set_next_ack(nrf, True, 3, id)
+        return False
 
     # Get the chunk id
     chunk_id = int.from_bytes([payload[1], payload[2]], "little")
 
     print("Chunk_is_good Frame received -> chunk_id : " + str(chunk_id))
+    if id != chunk_id:
+        print("Received id in chunk_is_good is from another id -> Expected id: " + str(id) + ", Received id: " + str(chunk_id))
+        return (False, -1)
 
     # Set a positive payload for the next ack
     print("Setting next ack to negative. For testing purposes")
-    set_next_ack(nrf, False)
+    set_next_ack(nrf, False, 3, id)
     
-    return (True, chunk_id)
+    return True
 
-def set_next_ack(nrf: NRF24, positive):
+def set_next_ack(nrf: NRF24, positive, type: int, id: int):
     if positive:
-        nrf.ack_payload(RF24_RX_ADDR.P1, bytes([1]))
+        nrf.ack_payload(RF24_RX_ADDR.P1, bytes([1]), type, id)
     else:
-        nrf.ack_payload(RF24_RX_ADDR.P1, bytes([0]))
+        nrf.ack_payload(RF24_RX_ADDR.P1, bytes([0]), type, id)
 
 def wait_data(nrf: NRF24):
     # print("Waiting for new data...")
