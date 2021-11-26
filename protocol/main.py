@@ -7,7 +7,6 @@ import os
 
 def main():
     
-    chunk_size = 80
     os.system("sudo pigpiod")
     # Get transmitter or receiver arguments
     ioparent.config()
@@ -36,7 +35,7 @@ def main():
 
         if SW[1] == 1:
             print("SW[1] == 1 --> Starting communcation as: SENDER")
-            start_sender(chunk_size)
+            start_sender()
         else:
             print("SW[1] == 0 --> Starting communcation as: RECEIVER")
             start_receiver()

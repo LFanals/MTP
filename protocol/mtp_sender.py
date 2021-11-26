@@ -16,7 +16,7 @@ import sys
 import ioparent
 
 
-def start_sender(chunk_size):
+def start_sender():
     print("Starting sender")
     ioparent.control_led(2, False)
     ioparent.control_led(3, False)
@@ -72,7 +72,6 @@ def start_sender(chunk_size):
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))
-    ioparent.control_led(1, False)
 
 def get_file_from_working_dir() -> str:
 
@@ -229,7 +228,7 @@ def send(nrf: NRF24, payload) -> bool:
     except TimeoutError:
         print("Timeout exceeded to send a packet")
         timeout = True
-    print("AFTER SEND: ", datetime.now())
+    # print("AFTER SEND: ", datetime.now())
     return not timeout
 
 def get_ack_payload(nrf: NRF24):
