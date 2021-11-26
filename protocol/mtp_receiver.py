@@ -131,7 +131,7 @@ def wait_hello(nrf: NRF24):
 
     wait_data(nrf)
 
-    print(nrf.get_payload_size)
+    print(nrf.get_payload_size())
     nrf.flush_tx()
     
     # Data is available, check it is hello frame
