@@ -107,7 +107,7 @@ def control_led(led: int, state: bool):
         else: GPIO.output(LED4, GPIO.LOW)
     elif (led == 5):
         if (state): GPIO.output(LED5, GPIO.HIGH)
-        else: GPIO.output(LED1, GPIO.LOW)
+        else: GPIO.output(LED5, GPIO.LOW)
     else:
         print("Bad led number")
 
