@@ -231,9 +231,9 @@ def wait_chunk_is_good(nrf: NRF24, good: bool, id: int):
 
 def set_next_ack(nrf: NRF24, positive, type: int, id: int):
     if positive:
-        nrf.ack_payload(RF24_RX_ADDR.P1, [(1).to_bytes(1, "big"), type.to_bytes(1, "big"), id.to_bytes(1, "big")])
+        nrf.ack_payload(RF24_RX_ADDR.P1, bytes([1, type, id]))
     else:
-        nrf.ack_payload(RF24_RX_ADDR.P1, [(0).to_bytes(1, "big"), type.to_bytes(1, "big"), id.to_bytes(1, "big")])
+        nrf.ack_payload(RF24_RX_ADDR.P1, bytes([0, type, id]))
 
 def wait_data(nrf: NRF24):
     # print("Waiting for new data...")
