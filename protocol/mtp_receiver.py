@@ -131,7 +131,6 @@ def wait_hello(nrf: NRF24):
 
     wait_data(nrf)
 
-    print(nrf.get_payload_size())
     nrf.flush_tx()
     
     # Data is available, check it is hello frame
@@ -234,9 +233,9 @@ def wait_chunk_is_good(nrf: NRF24, good: bool, id: int):
 
 def set_next_ack(nrf: NRF24, positive, type: int, id: int):
     if positive:
-        nrf.ack_payload(RF24_RX_ADDR.P1, "Hola")
+        nrf.ack_payload(RF24_RX_ADDR.P1, 1)
     else:
-        nrf.ack_payload(RF24_RX_ADDR.P1, "Hola")
+        nrf.ack_payload(RF24_RX_ADDR.P1, 0)
 
 def wait_data(nrf: NRF24):
     # print("Waiting for new data...")
