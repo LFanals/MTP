@@ -49,7 +49,7 @@ def start_receiver():
         # Wait for chunk_info until we receive a chunk_info packet
         is_chunk_info = False
         while not is_chunk_info:
-            (is_chunk_info, num_subchunks, chunk_id) = wait_chunk_info(nrf, i)
+            (is_chunk_info, num_subchunks) = wait_chunk_info(nrf, i)
             if not is_chunk_info:
                 print("Packet received is not a chunk info packet. Waiting again for chunk info packet...")
 
