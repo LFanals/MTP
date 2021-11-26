@@ -5,7 +5,6 @@ import protocol_utils as p_utils
 
 # nrf24 library import
 from nrf24 import *
-import constants
 
 # General imports
 import subprocess
@@ -16,10 +15,19 @@ import sys
 import ioparent
 
 
-def start_sender(chunk_size):
+def start_sender(mode):
     print("Starting sender")
     ioparent.control_led(1, True)
     time_start = time.time()
+    global config
+    if mode: 
+        import MRMconfig as config
+    else:
+        import SRconfig as config
+    
+    print("TEST")
+    print(config.CHANNEL)
+
 
     # Setup nrf24 sender
     nrf = setup_sender()
@@ -31,7 +39,7 @@ def start_sender(chunk_size):
     filename = get_file_from_working_dir()
 
     # Get file chunks
-    chunks = chunk_handler.get_file_chunks(filename, constants.CHUNK_SIZE)
+    chunks = chunk_handler.get_file_chunks(filename, config.CHUNK_SIZE, config.COMPRESSION_LEVEL)
     subchunks = packet_creator.create_data_frames(chunks)
 
     # Send Hello frame
@@ -46,7 +54,15 @@ def start_sender(chunk_size):
     # Start sending the data frames
     # For each chunk we send a chunk_info frame with the number of subchunks and the chunk id
     # To start sending the subchunks we must receive a positive ack to the chunk_info frame
+    ioparent.control_led(3, True)
+
     for chunk_id in range(len(chunks)):
+        if chunk_id > 2*len(chunks)/3: 
+            ioparent.control_led(4, True)
+        elif chunk_id >= len(chunks) - 1:
+            ioparent.control_led(4, True)
+            ioparent.control_led(5, True)
+            
         subchunk_num = len(subchunks[chunk_id])
         ready = False
         while not ready:
@@ -54,7 +70,7 @@ def start_sender(chunk_size):
                 # TODO: delete this while
                 # Receiver is not ready yet or the ack has been lost. Wait and try again
                 print("Positive ack not received to chunk_info frame, sending again...")
-                time.sleep(constants.RETRY_DELAY)
+                time.sleep(config.RETRY_DELAY)
             else:
                 ready = True
         # Receiver is ready to receive the data frames
@@ -63,7 +79,7 @@ def start_sender(chunk_size):
             while not ready:
                 if not send_subchunk(nrf, subchunk):
                     print("Positive ack not received to data frame, sending again...")
-                    time.sleep(constants.RETRY_DELAY)
+                    time.sleep(config.RETRY_DELAY)
                 else:
                     ready = True
     print("Reached end of program. In theory all data has been sent correctly")
@@ -101,7 +117,7 @@ def setup_sender():
 def create_sender_nrf(pi, address):
     # Create NRF24 object.
     # PLEASE NOTE: PA level is set to MIN, because test sender/receivers are often close to each other, and then MIN works better.
-    nrf = NRF24(pi, ce=25, spi_speed=constants.SPI_SPEED, payload_size=constants.PAYLOAD_SIZE, channel=constants.CHANNEL, data_rate=constants.DATA_RATE, pa_level=constants.PA_LEVEL)
+    nrf = NRF24(pi, ce=25, spi_speed=config.SPI_SPEED, payload_size=config.PAYLOAD_SIZE, channel=config.CHANNEL, data_rate=config.DATA_RATE, pa_level=config.PA_LEVEL)
     nrf.set_address_bytes(len(address))
     nrf.set_retransmission(1, 15)
     nrf.open_writing_pipe(address)
@@ -136,7 +152,7 @@ def send_hello(nrf: NRF24, chunk_num: int) -> bool:
 
         if not ack_received:
             print("  * ACK for hello frame not received. Retrying transmission. Attempt: " + str(attempt))
-            time.sleep(constants.RETRY_DELAY)
+            time.sleep(config.RETRY_DELAY)
             attempt += 1
         
         else: 
@@ -171,7 +187,7 @@ def send_chunk_info(nrf: NRF24, subchunk_num, chunk_id):
 
         if not ack_received:
             print("  * ACK for chunk info frame not received. Retrying transmission. Attempt: " + str(attempt))
-            time.sleep(constants.RETRY_DELAY)
+            time.sleep(config.RETRY_DELAY)
             attempt += 1
         
         else: 
@@ -203,7 +219,7 @@ def send_subchunk(nrf: NRF24, subchunk):
 
         if not ack_received:
             print("  * ACK for data frame not received. Retrying transmission. Attempt: " + str(attempt))
-            time.sleep(constants.RETRY_DELAY)
+            time.sleep(config.RETRY_DELAY)
             attempt += 1
         
         else: 

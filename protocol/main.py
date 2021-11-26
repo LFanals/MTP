@@ -22,23 +22,26 @@ def main():
 
     state, SW = ioparent.read_switches() # get switches config, decide which son to run, add logic below
     print("Master switch set to 1. Reading configuration")
+    is_TX = SW[1]
+    is_NM = SW[2]
+    mode = SW[3]
 
-    if SW[2] == 1: 
+    if is_NM == 1: 
         print("SW[2] == 1 --> Mode: NM")
         #TODO: link with NM logic
     else:
         print("SW[2] == 0 --> Mode: MRM or SR")
-        if SW[3] == 1:
+        if mode == 1:
             print("SW[3] == 1 --> Mode: MRM")
         else:
             print("SW[3] == 0 --> Mode: SR")
 
-        if SW[1] == 1:
+        if is_TX == 1:
             print("SW[1] == 1 --> Starting communcation as: SENDER")
-            start_sender(chunk_size)
+            start_sender(mode)
         else:
             print("SW[1] == 0 --> Starting communcation as: RECEIVER")
-            start_receiver()
+            start_receiver(mode)
 
 if __name__ == "__main__":
     main()

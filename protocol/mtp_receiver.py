@@ -1,11 +1,11 @@
 # local imports 
+from protocol.SRconfig import COMPRESSION_LEVEL
 import protocol_utils as p_utils
 import chunk_handler
 import ioparent
 
 # nrf24 library import
 from nrf24 import *
-import constants
 
 # general imports
 import time
@@ -14,8 +14,17 @@ import sys
 import os
 import subprocess
 
-def start_receiver():
+def start_receiver(mode):
     print("Starting receiver")
+
+    global config
+    if mode: 
+        import MRMconfig as config
+    else:
+        import SRconfig as config
+    
+    print("TEST")
+    print(config.CHANNEL)
 
     # Setup nrf24
     nrf = setup_receiver()
@@ -41,6 +50,7 @@ def start_receiver():
         if i > 2*num_chunks/3: 
             ioparent.control_led(4, True)
         elif i >= num_chunks - 1:
+            ioparent.control_led(4, True)
             ioparent.control_led(5, True)
 
 
@@ -77,12 +87,12 @@ def start_receiver():
         # All subchunks of chunk have been received. Decompress and save to file
         # for testing purposes we just print it to console
         print("------------chunk id: " + str(chunk_id) + "----------------")
-        decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
+        decompressed_chunk = chunk_handler.decompress_chunk(chunk_data, config.COMPRESSION_LEVEL)
         # print(decompressed_chunk)
         write_chunk_to_file(filename, decompressed_chunk)        
 
     print("All data has been received correctly, copying file to usb")
-    ioparent.control_led(0, False)
+    ioparent.control_led(1, False)
     subprocess.call("./write_usb.sh")
 
 
@@ -104,7 +114,7 @@ def create_receiver_nrf(pi, address):
     # Create NRF24 object.
     # PLEASE NOTE: PA level is set to MIN, because test sender/receivers are often close to each other, and then MIN works better.
     # ALSO NOTE: pauload size is set to ACK. That means that payload is variable and acks can contain payload as well
-    nrf = NRF24(pi, ce=25, spi_speed=constants.SPI_SPEED, payload_size=constants.PAYLOAD_SIZE, channel=constants.CHANNEL, data_rate=constants.DATA_RATE, pa_level=constants.PA_LEVEL)
+    nrf = NRF24(pi, ce=25, spi_speed=config.SPI_SPEED, payload_size=config.PAYLOAD_SIZE, channel=config.CHANNEL, data_rate=config.DATA_RATE, pa_level=config.PA_LEVEL)
     nrf.set_address_bytes(len(address))
 
     # Listen on the address specified as parameter
@@ -185,7 +195,7 @@ def set_next_ack(nrf: NRF24, positive):
 def wait_data(nrf: NRF24):
     # print("Waiting for new data...")
     while not nrf.data_ready():
-        time.sleep(constants.RETRY_DELAY)
+        time.sleep(config.RETRY_DELAY)
 
 def clean_working_dir(filename):
     try:
