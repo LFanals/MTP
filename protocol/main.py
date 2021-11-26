@@ -22,6 +22,7 @@ def main():
 
     state, SW = ioparent.read_switches() # get switches config, decide which son to run, add logic below
     print("Master switch set to 1. Reading configuration")
+    ioparent.control_led(1, True)
 
     if SW[2] == 1: 
         print("SW[2] == 1 --> Mode: NM")

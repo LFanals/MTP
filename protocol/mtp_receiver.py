@@ -16,6 +16,10 @@ import subprocess
 
 def start_receiver():
     print("Starting receiver")
+    ioparent.control_led(2, False)
+    ioparent.control_led(3, False)
+    ioparent.control_led(4, False)
+    ioparent.control_led(5, False)
 
     # Setup nrf24
     nrf = setup_receiver()
@@ -32,13 +36,12 @@ def start_receiver():
         sys.exit()
     
     # At this point a positive ack has been sent
-    ioparent.control_led(1, True)
     ioparent.control_led(3, True)
 
     for i in range(num_chunks):
         
         # LEDs 3, 4 and 5 will indicate the received percentage
-        if i > 2*num_chunks/3: 
+        if i > num_chunks/2: 
             ioparent.control_led(4, True)
         elif i >= num_chunks - 1:
             ioparent.control_led(5, True)

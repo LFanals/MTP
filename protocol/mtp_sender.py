@@ -18,7 +18,10 @@ import ioparent
 
 def start_sender(chunk_size):
     print("Starting sender")
-    ioparent.control_led(1, True)
+    ioparent.control_led(2, False)
+    ioparent.control_led(3, False)
+    ioparent.control_led(4, False)
+    ioparent.control_led(5, False)
     time_start = time.time()
 
     # Setup nrf24 sender
@@ -220,13 +223,13 @@ def send(nrf: NRF24, payload) -> bool:
     nrf.send(payload)
 
     # Wait for transmission to complete.
-    timeout = False
-    # try:
-    #     nrf.wait_until_sent()
-    # except TimeoutError:
-    #     print("Timeout exceeded to send a packet")
-    #     timeout = True
-    # print("AFTER SEND: ", datetime.now())
+    try:
+        timeout = False
+        nrf.wait_until_sent()
+    except TimeoutError:
+        print("Timeout exceeded to send a packet")
+        timeout = True
+    print("AFTER SEND: ", datetime.now())
     return not timeout
 
 def get_ack_payload(nrf: NRF24):
