@@ -19,7 +19,7 @@ radio.setDataRate(RF24.RF24_250KBPS)
 # radio.setDataRate(RF24.RF24_2MBPS)
 
 radio.setChannel(0x4c)
-radio.openWritingPipe(b"RXTX")
+radio.openWritingPipe(0, b"RXTX")
 radio.openReadingPipe(1, b"TXRX")
 radio.startListening()
 radio.printDetails()

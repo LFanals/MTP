@@ -25,8 +25,8 @@ radio.enableAckPayload()
 
 
 
-radio.openWritingPipe(b"TXRX")
-radio.openReadingPipe(1, b"RXTX")
+radio.openWritingPipe(1, b"TXRX")
+radio.openReadingPipe(0, b"RXTX")
 radio.powerUp()
 radio.printDetails()
 
