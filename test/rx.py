@@ -8,7 +8,8 @@ pipesbytes = bytearray(pipes)
 
 radio = RF24.RF24(1000000)
 radio.begin(25, 0) #Set CE and IRQ pins
-radio.setPALevel(RF24.RF24_PA_MAX)
+# radio.setPALevel(RF24.RF24_PA_MAX)
+radio.setPALevel(RF24.RF24_PA_MIN)
 radio.setDataRate(RF24.RF24_250KBPS)
 radio.setChannel(0x4c)
 radio.openReadingPipe(1, pipesbytes)

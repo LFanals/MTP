@@ -13,7 +13,8 @@ radio.setDataRate(RF24.RF24_250KBPS)
 radio.setRetries(3,5)
 
 
-radio.setPALevel(RF24.RF24_PA_MAX)
+# radio.setPALevel(RF24.RF24_PA_MAX)
+radio.setPALevel(RF24.RF24_PA_MIN)
 radio.openWritingPipe(pipesbytes)
 radio.powerUp()
 radio.printDetails()
