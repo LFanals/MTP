@@ -32,4 +32,4 @@ while True:
 
   recv_buffer = bytearray([])
   recv_buffer = radio.read(32)
-  print(recv_buffer)
+  # print(recv_buffer)

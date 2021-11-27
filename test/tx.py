@@ -25,9 +25,11 @@ n = 0
 while True:
   n += 1
   a = time.time()
-  print(radio.write(b"HolaHolaHolaHola"))
+  # print(radio.write(b"HolaHolaHolaHola"))
+  radio.write(b"HolaHolaHolaHola")
   avg = (avg*(n-1) + (time.time() - a))/n
-  print(avg)
+  if (n % 100 == 0):
+      print(avg)
   # time.sleep(1)
 
 
