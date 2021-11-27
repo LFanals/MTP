@@ -25,7 +25,7 @@ while True:
 
   while not radio.available():
     # time.sleep(0.250)
-    time.sleep(0.0001)
+    time.sleep(0.000001)
     
 
   recv_buffer = bytearray([])
