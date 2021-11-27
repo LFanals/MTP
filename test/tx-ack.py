@@ -43,9 +43,5 @@ while True:
   print(radio.write(b"HolaHolaHolaHola"))
   avg = (avg*(n-1) + (time.time() - a))/n
   print(avg)
-  print(radio.read(16))
+  print(radio.read(2))
   # time.sleep(1)
-
-
-
-
