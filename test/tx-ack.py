@@ -1,9 +1,9 @@
 import RF24
 import time
 
-pipes = [ 0x52, 0x78, 0x41, 0x41, 0x41 ] 
-
-pipesbytes = bytearray(pipes)
+# PIPES (Adresses)
+# TX -------- TXRX --------> RX
+# TX <-------- RXTX -------- RX
 
 radio = RF24.RF24(1000000)
 # radio = RF24.RF24(10000000)
@@ -18,14 +18,15 @@ radio.setRetries(3,5)
 radio.setPALevel(RF24.RF24_PA_MIN)
 
 # ACK payloads are dynamically sized.
-#radio.enableDynamicPayloads()  # to use ACK payloads
+radio.enableDynamicPayloads()  # to use ACK payloads
 
 # to enable the custom ACK payload feature
-#radio.enableAckPayload()
+radio.enableAckPayload()
 
 
 
-radio.openWritingPipe(b"AAA")
+radio.openWritingPipe(b"TXRX")
+radio.openReadingPipe(1, b"RXTX")
 radio.powerUp()
 radio.printDetails()
 
