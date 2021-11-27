@@ -24,7 +24,7 @@ while True:
   pipe = [1]
 
   while not radio.available():
-    time.sleep(0.250)
+    # time.sleep(0.250)
     
 
   recv_buffer = bytearray([])
