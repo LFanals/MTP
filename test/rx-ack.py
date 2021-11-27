@@ -27,7 +27,6 @@ radio.setChannel(0x4c)
 radio.openWritingPipe(b"BBB")
 radio.openReadingPipe(1, b"AAA")
 radio.powerUp()
-radio.startListening()
 radio.printPrettyDetails()
 
 #radio.powerUp()
@@ -36,7 +35,7 @@ cont=0
 radio.startListening()  # put radio in RX mode
 
 while True:
-  pipe = [1]
+  #pipe = [1]
 
   #radio.writeAckPayload(1, b"xd")  # load ACK
 
