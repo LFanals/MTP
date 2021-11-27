@@ -22,7 +22,7 @@ radio.setChannel(0x4c)
 radio.openWritingPipe(b"RXTX")
 radio.openReadingPipe(1, b"TXRX")
 radio.startListening()
-radio.printDetails()
+radio.printPrettyDetails()
 
 #radio.powerUp()
 cont=0

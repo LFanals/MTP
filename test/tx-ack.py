@@ -28,7 +28,7 @@ radio.enableAckPayload()
 radio.openWritingPipe(b"TXRX")
 radio.openReadingPipe(0, b"RXTX")
 radio.powerUp()
-radio.printDetails()
+radio.printPrettyDetails()
 
 avg = 0
 n = 0
