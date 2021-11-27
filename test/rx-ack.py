@@ -33,7 +33,7 @@ radio.startListening()  # put radio in RX mode
 while True:
   pipe = [1]
 
-  radio.writeAckPayload(1, b"xd")  # load ACK
+  radio.writeAckPayload(1, b"HolaHolaHolaHola")  # load ACK
 
   while not radio.available():
     # time.sleep(0.250)
