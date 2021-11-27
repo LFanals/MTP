@@ -43,6 +43,11 @@ while True:
   print(radio.write(b"HolaHolaHolaHola"))
   avg = (avg*(n-1) + (time.time() - a))/n
   print(avg)
+  radio.startListening()
+  timeout = time.monotonic() * 1000 + 200
+  while not radio.available() and time.monotonic() * 1000 < timeout:
+    pass  # wait for incoming payload or timeout
+  radio.stopListening()
   print(radio.read(2))
   # time.sleep(1)
 

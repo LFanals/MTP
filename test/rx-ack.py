@@ -14,9 +14,8 @@ radio = RF24.RF24(1000000)
 # radio = RF24.RF24(10000000)
 radio.begin(25, 0) #Set CE and IRQ pins
 radio.setPALevel(RF24.RF24_PA_MIN)
-# radio.setPALevel(RF24.RF24_PA_MAX)
 radio.setDataRate(RF24.RF24_250KBPS)
-# radio.setDataRate(RF24.RF24_2MBPS)
+radio.setRetries(3,5)
 
 # ACK payloads are dynamically sized.
 radio.enableDynamicPayloads()  # to use ACK payloads
@@ -27,6 +26,7 @@ radio.enableAckPayload()
 radio.setChannel(0x4c)
 radio.openWritingPipe(b"BBB")
 radio.openReadingPipe(1, b"AAA")
+radio.powerUp()
 radio.startListening()
 radio.printPrettyDetails()
 
