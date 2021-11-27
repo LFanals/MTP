@@ -14,19 +14,15 @@ radio = RF24.RF24(1000000)
 # radio = RF24.RF24(10000000)
 radio.begin(25, 0) #Set CE and IRQ pins
 radio.setPALevel(RF24.RF24_PA_MIN)
+# radio.setPALevel(RF24.RF24_PA_MAX)
 radio.setDataRate(RF24.RF24_250KBPS)
+# radio.setDataRate(RF24.RF24_2MBPS)
 radio.setRetries(3,5)
-
-# ACK payloads are dynamically sized.
-radio.enableDynamicPayloads()  # to use ACK payloads
-
-# to enable the custom ACK payload feature
-radio.enableAckPayload()
 
 radio.setChannel(0x4c)
 radio.openWritingPipe(b"BBB")
 radio.openReadingPipe(1, b"AAA")
-radio.powerUp()
+radio.startListening()
 radio.printPrettyDetails()
 
 #radio.powerUp()
@@ -34,10 +30,10 @@ cont=0
 
 radio.startListening()  # put radio in RX mode
 
-for i in range(10):
-  #pipe = [1]
+while True:
+  pipe = [1]
 
-  #radio.writeAckPayload(1, b"xd")  # load ACK
+  radio.writeAckPayload(1, b"xd")  # load ACK
 
   while not radio.available():
     # time.sleep(0.250)
@@ -45,10 +41,5 @@ for i in range(10):
     
 
   recv_buffer = bytearray([])
-  recv_buffer = radio.read(16)
-  radio.stopListening()
+  recv_buffer = radio.read(32)
   print(recv_buffer)
-  print(radio.write(b"xd"))
-  radio.startListening()
-
-radio.printPrettyDetails()

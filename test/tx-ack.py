@@ -37,20 +37,15 @@ n = 0
 
 radio.stopListening()  # put radio in TX mode
 
-for i in range(10):
+while True:
   n += 1
   a = time.time()
   print(radio.write(b"HolaHolaHolaHola"))
   avg = (avg*(n-1) + (time.time() - a))/n
   print(avg)
-  radio.startListening()
-  timeout = time.monotonic() * 1000 + 200
-  while not radio.available() and time.monotonic() * 1000 < timeout:
-    pass  # wait for incoming payload or timeout
-  radio.stopListening()
   print(radio.read(2))
   # time.sleep(1)
 
-radio.printPrettyDetails()
+
 
 
