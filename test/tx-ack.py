@@ -25,19 +25,23 @@ radio.enableAckPayload()
 
 
 
-radio.openWritingPipe(1, b"TXRX")
+radio.openWritingPipe(b"TXRX")
 radio.openReadingPipe(0, b"RXTX")
 radio.powerUp()
 radio.printDetails()
 
 avg = 0
 n = 0
+
+radio.stopListening()  # put radio in TX mode
+
 while True:
   n += 1
   a = time.time()
   print(radio.write(b"HolaHolaHolaHola"))
   avg = (avg*(n-1) + (time.time() - a))/n
   print(avg)
+  print(radio.read(32))
   # time.sleep(1)
 
 

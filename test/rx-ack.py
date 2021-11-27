@@ -19,7 +19,7 @@ radio.setDataRate(RF24.RF24_250KBPS)
 # radio.setDataRate(RF24.RF24_2MBPS)
 
 radio.setChannel(0x4c)
-radio.openWritingPipe(0, b"RXTX")
+radio.openWritingPipe(b"RXTX")
 radio.openReadingPipe(1, b"TXRX")
 radio.startListening()
 radio.printDetails()
@@ -27,8 +27,12 @@ radio.printDetails()
 #radio.powerUp()
 cont=0
 
+radio.startListening()  # put radio in RX mode
+
 while True:
   pipe = [1]
+
+  radio.writeAckPayload(1, b"HolaHolaHolaHola")  # load ACK
 
   while not radio.available():
     # time.sleep(0.250)
