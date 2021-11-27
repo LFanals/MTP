@@ -24,6 +24,8 @@ radio.enableDynamicPayloads()  # to use ACK payloads
 radio.enableAckPayload()
 
 
+# radio channel 
+radio.setChannel(0x4c)
 
 radio.openWritingPipe(b"AAA")
 radio.openReadingPipe(1, b"BBB")

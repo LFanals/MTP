@@ -18,6 +18,12 @@ radio.setPALevel(RF24.RF24_PA_MIN)
 radio.setDataRate(RF24.RF24_250KBPS)
 # radio.setDataRate(RF24.RF24_2MBPS)
 
+# ACK payloads are dynamically sized.
+radio.enableDynamicPayloads()  # to use ACK payloads
+
+# to enable the custom ACK payload feature
+radio.enableAckPayload()
+
 radio.setChannel(0x4c)
 radio.openWritingPipe(b"BBB")
 radio.openReadingPipe(1, b"AAA")
