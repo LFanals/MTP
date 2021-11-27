@@ -47,4 +47,7 @@ while True:
 
   recv_buffer = bytearray([])
   recv_buffer = radio.read(16)
+  radio.stopListening()
   print(recv_buffer)
+  print(radio.write(b"xd"))
+  radio.startListening()
