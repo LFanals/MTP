@@ -35,7 +35,7 @@ cont=0
 
 radio.startListening()  # put radio in RX mode
 
-while True:
+for i in range(10):
   pipe = [1]
 
   radio.writeAckPayload(1, b"xd")  # load ACK
@@ -48,3 +48,6 @@ while True:
   recv_buffer = bytearray([])
   recv_buffer = radio.read(16)
   print(recv_buffer)
+
+
+radio.printPrettyDetails()

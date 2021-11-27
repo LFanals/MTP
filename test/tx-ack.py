@@ -37,7 +37,7 @@ n = 0
 
 radio.stopListening()  # put radio in TX mode
 
-while True:
+for i in range(10):
   n += 1
   a = time.time()
   print(radio.write(b"HolaHolaHolaHola"))
@@ -45,3 +45,5 @@ while True:
   print(avg)
   print(radio.read(2))
   # time.sleep(1)
+
+radio.printPrettyDetails()
