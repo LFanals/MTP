@@ -7,8 +7,8 @@ pipes = [ 0x52, 0x78, 0x41, 0x41, 0x41 ]
 pipesbytes = bytearray(pipes)
 
 # PIPES
-# TX -------- TXRX --------> RX
-# TX <-------- RXTX -------- RX
+# TX -------- AAA --------> RX
+# TX <-------- BBB -------- RX
 
 radio = RF24.RF24(1000000)
 # radio = RF24.RF24(10000000)
@@ -19,8 +19,8 @@ radio.setDataRate(RF24.RF24_250KBPS)
 # radio.setDataRate(RF24.RF24_2MBPS)
 
 radio.setChannel(0x4c)
-radio.openWritingPipe(b"RXTX")
-radio.openReadingPipe(1, b"TXRX")
+radio.openWritingPipe(b"BBB")
+radio.openReadingPipe(1, b"AAA")
 radio.startListening()
 radio.printPrettyDetails()
 

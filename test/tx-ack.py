@@ -2,8 +2,8 @@ import RF24
 import time
 
 # PIPES (Adresses)
-# TX -------- TXRX --------> RX
-# TX <-------- RXTX -------- RX
+# TX -------- AAA --------> RX
+# TX <-------- BBB -------- RX
 
 radio = RF24.RF24(1000000)
 # radio = RF24.RF24(10000000)
@@ -25,8 +25,8 @@ radio.enableAckPayload()
 
 
 
-radio.openWritingPipe(b"TXRX")
-radio.openReadingPipe(0, b"RXTX")
+radio.openWritingPipe(b"AAA")
+radio.openReadingPipe(1, b"BBB")
 radio.powerUp()
 radio.printPrettyDetails()
 
