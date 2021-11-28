@@ -48,7 +48,7 @@ def start_receiver():
         for subchunk_id in range(num_subchunks):
             data = wait_data_frame(radio, subchunk_id)
             
-            if (subchunk_id != 0) and (not subchunk_id%10):
+            if subchunk_id != 0 and subchunk_id%25 == 0:
                 print("Received until subchunk " + str(subchunk_id))
             
             # Add the data to the chunk data bytearray
@@ -175,8 +175,6 @@ def check_chunk_info_frame(payload, expected_id):
 def check_data_frame(payload, expected_id):
     (type, id) = get_data_frame_type_and_id(payload)
     ret_val = type == utils.DATA_TYPE
-    print("received id: " + str(id) + ", expected id: " + str(expected_id))
-    print("type: " + str(type) + ", id: " + str(id==expected_id))
     return ret_val and id == expected_id
 
 def get_data_frame_type_and_id(payload):

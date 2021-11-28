@@ -43,9 +43,10 @@ def start_sender(chunk_size):
         # Receiver is ready to receive the data frames
         count = 0
         for subchunk in subchunks[chunk_id]:
-            print("Sending subchunk: " + str(count))
             send_subchunk(radio, subchunk)
             count = count + 1
+            if count !=0 and count % 25 == 0:
+                print("Sent until subchunk " + str(count))
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))
@@ -160,7 +161,6 @@ def send_infinity(radio, payload, check_ack_is_positive):
 def send(radio, payload):
     
     if radio.write(payload): # Sends and waits ack (2 layer OSI retries included)
-        print("Success")
         has_payload, pipe_number = radio.available_pipe()
         if has_payload:
             length = radio.getDynamicPayloadSize()
