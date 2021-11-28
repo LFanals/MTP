@@ -45,7 +45,7 @@ def start_receiver():
         # Wait for chunk_info
         wait_chunk_info(radio, i)
         
-        return
+        break
         for subchunk_id in range(num_subchunks):
             (is_data_frame, data) = wait_data_frame(nrf)
             if not is_data_frame:

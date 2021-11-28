@@ -39,7 +39,7 @@ def start_sender(chunk_size):
     for chunk_id in range(len(chunks)):
         subchunk_num = len(subchunks[chunk_id])
         send_chunk_info(radio, subchunk_num, chunk_id)
-        return
+        break
         # Receiver is ready to receive the data frames
         for subchunk in subchunks[chunk_id]:
             ready = False
