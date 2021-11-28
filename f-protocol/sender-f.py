@@ -240,4 +240,4 @@ def is_ack_positive(ack_payload):
 
 
 if __name__ == "__main__":
-    start_sender()
+    start_sender(10)
