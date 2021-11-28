@@ -10,12 +10,15 @@ import constants
 # General imports
 import subprocess
 import time
+from datetime import datetime
 import os
 import sys
+import ioparent
 
 
-def start_sender():
+def start_sender(chunk_size):
     print("Starting sender")
+    ioparent.control_led(1, True)
     time_start = time.time()
 
     # Setup nrf24 sender
@@ -48,6 +51,7 @@ def start_sender():
         ready = False
         while not ready:
             if not send_chunk_info(nrf, subchunk_num, chunk_id):
+                # TODO: delete this while
                 # Receiver is not ready yet or the ack has been lost. Wait and try again
                 print("Positive ack not received to chunk_info frame, sending again...")
                 time.sleep(constants.RETRY_DELAY)
@@ -65,6 +69,7 @@ def start_sender():
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))
+    ioparent.control_led(1, False)
 
 def get_file_from_working_dir() -> str:
 
@@ -96,9 +101,9 @@ def setup_sender():
 def create_sender_nrf(pi, address):
     # Create NRF24 object.
     # PLEASE NOTE: PA level is set to MIN, because test sender/receivers are often close to each other, and then MIN works better.
-    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.ACK, channel=constants.CHANNEL, data_rate=constants.DATA_RATE, pa_level=constants.PA_LEVEL)
+    nrf = NRF24(pi, ce=25, spi_speed=constants.SPI_SPEED, payload_size=constants.PAYLOAD_SIZE, channel=constants.CHANNEL, data_rate=constants.DATA_RATE, pa_level=constants.PA_LEVEL)
     nrf.set_address_bytes(len(address))
-    nrf.set_retransmission(15, 15)
+    nrf.set_retransmission(1, 15)
     nrf.open_writing_pipe(address)
     
     # Display the content of the nrf24 device registers.
@@ -178,7 +183,7 @@ def send_subchunk(nrf: NRF24, subchunk):
     # Sends a subchunk data frame, waits for the ack
     # If everything is successful returns true
 
-    print("Sending data frame")
+    # print("Sending data frame")
     
     attempt = 1
     while attempt:
@@ -209,17 +214,19 @@ def send_subchunk(nrf: NRF24, subchunk):
 def send(nrf: NRF24, payload) -> bool:
     # Sends the a packet and waits until it is sent
     # If timeout exideed returns False, True otherwise
-    
+    # print("")
+    # print("BEFORE SEND: ", datetime.now())
     nrf.reset_packages_lost()
     nrf.send(payload)
 
     # Wait for transmission to complete.
     timeout = False
-    try:
-        nrf.wait_until_sent()
-    except TimeoutError:
-        print("Timeout exceeded to send a packet")
-        timeout = True
+    # try:
+    #     nrf.wait_until_sent()
+    # except TimeoutError:
+    #     print("Timeout exceeded to send a packet")
+    #     timeout = True
+    # print("AFTER SEND: ", datetime.now())
     return not timeout
 
 def get_ack_payload(nrf: NRF24):
@@ -245,7 +252,7 @@ def is_package_lost(nrf: NRF24):
 
 def is_ack_positive(ack_payload):
     if ack_payload[0] == 1:
-        print("Checking ack -> Positive")
+        # print("Checking ack -> Positive")
         return True
 
     print("Checking ack -> Negative")

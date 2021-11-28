@@ -1,6 +1,7 @@
 # local imports 
 import protocol_utils as p_utils
 import chunk_handler
+import ioparent
 
 # nrf24 library import
 from nrf24 import *
@@ -8,6 +9,7 @@ import constants
 
 # general imports
 import time
+from datetime import datetime
 import sys
 import os
 import subprocess
@@ -30,8 +32,18 @@ def start_receiver():
         sys.exit()
     
     # At this point a positive ack has been sent
+    ioparent.control_led(1, True)
+    ioparent.control_led(3, True)
 
     for i in range(num_chunks):
+        
+        # LEDs 3, 4 and 5 will indicate the received percentage
+        if i > 2*num_chunks/3: 
+            ioparent.control_led(4, True)
+        elif i >= num_chunks - 1:
+            ioparent.control_led(5, True)
+
+
         chunk_data = bytearray()
         # Wait for chunk_info
         is_chunk_info = False
@@ -70,6 +82,7 @@ def start_receiver():
         write_chunk_to_file(filename, decompressed_chunk)        
 
     print("All data has been received correctly, copying file to usb")
+    ioparent.control_led(0, False)
     subprocess.call("./write_usb.sh")
 
 
@@ -91,7 +104,7 @@ def create_receiver_nrf(pi, address):
     # Create NRF24 object.
     # PLEASE NOTE: PA level is set to MIN, because test sender/receivers are often close to each other, and then MIN works better.
     # ALSO NOTE: pauload size is set to ACK. That means that payload is variable and acks can contain payload as well
-    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.ACK, channel=constants.CHANNEL, data_rate=constants.DATA_RATE, pa_level=constants.PA_LEVEL)
+    nrf = NRF24(pi, ce=25, spi_speed=constants.SPI_SPEED, payload_size=constants.PAYLOAD_SIZE, channel=constants.CHANNEL, data_rate=constants.DATA_RATE, pa_level=constants.PA_LEVEL)
     nrf.set_address_bytes(len(address))
 
     # Listen on the address specified as parameter
@@ -104,10 +117,9 @@ def create_receiver_nrf(pi, address):
 
 def wait_hello(nrf: NRF24):
 
-    wait_data(nrf)
-
     # Set a positive payload for the next ack
     set_next_ack(nrf, True)
+    wait_data(nrf)
     
     # Data is available, check it is hello frame
     payload = nrf.get_payload()
@@ -122,9 +134,9 @@ def wait_hello(nrf: NRF24):
 
 def wait_chunk_info(nrf: NRF24): 
 
-    wait_data(nrf)
     # Set a positive payload for the next ack
     set_next_ack(nrf, True)
+    wait_data(nrf)
 
     # Data is available, check it is chunk_info frame
     payload = nrf.get_payload()
@@ -145,20 +157,23 @@ def wait_chunk_info(nrf: NRF24):
     return (True, subchunks_num, chunk_id)
 
 def wait_data_frame(nrf: NRF24):
-
-    wait_data(nrf)
+    # print("")
+    # print("ENTERING wait_data_frame: ", datetime.now())
     # Set a positive payload for the next ack
     set_next_ack(nrf, True)
+    # print("ACK SET: ", datetime.now())
 
+    wait_data(nrf)
+    # print("DATA RECEIVED", datetime.now())
     # Data is available, check it is data frame
     payload = nrf.get_payload()
     if payload[0] != 0x02:
         print("Frame received is not a data frame: payload[0] = " + str(payload[0]))
         return (False, -1)
+    # print("PAYLOAD READ: ", datetime.now())
 
     # Get data (bytes from position 1 until end)
     data = payload[1:32]
-    
     return (True, data)
 
 def set_next_ack(nrf: NRF24, positive):
@@ -168,7 +183,7 @@ def set_next_ack(nrf: NRF24, positive):
         nrf.ack_payload(RF24_RX_ADDR.P1, bytes([0]))
 
 def wait_data(nrf: NRF24):
-    print("Waiting for new data...")
+    # print("Waiting for new data...")
     while not nrf.data_ready():
         time.sleep(constants.RETRY_DELAY)
 
