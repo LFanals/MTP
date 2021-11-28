@@ -136,7 +136,7 @@ def send(radio, payload):
         print("Failed")
         return (False, -1)
 
-def send_chunk_info(nrf: NRF24, subchunk_num, chunk_id):
+def send_chunk_info(nrf: RF24, subchunk_num, chunk_id):
     # Sends the chunk info frame, waits for the ack and checks that is it positive
     # If everything is successful returns true
 
@@ -162,7 +162,7 @@ def send_chunk_info(nrf: NRF24, subchunk_num, chunk_id):
 
         if not ack_received:
             print("  * ACK for chunk info frame not received. Retrying transmission. Attempt: " + str(attempt))
-            time.sleep(constants.RETRY_DELAY)
+            time.sleep(utils.RETRY_DELAY)
             attempt += 1
         
         else: 
@@ -170,7 +170,7 @@ def send_chunk_info(nrf: NRF24, subchunk_num, chunk_id):
 
     return is_ack_positive(ack_payload)
 
-def send_subchunk(nrf: NRF24, subchunk):
+def send_subchunk(nrf: RF24, subchunk):
     # Sends a subchunk data frame, waits for the ack
     # If everything is successful returns true
 
@@ -208,7 +208,7 @@ def send(radio: RF24, payload) -> bool:
 
     radio.write(payload)
 
-def get_ack_payload(nrf: NRF24):
+def get_ack_payload(nrf: RF24):
     # Check if an acknowledgement package is available.
     if nrf.data_ready():
         # Get payload.
@@ -221,7 +221,7 @@ def get_ack_payload(nrf: NRF24):
         # TODO: Handle this case when the ack doesn't arrive 
         return (False, -1)
 
-def is_package_lost(nrf: NRF24):
+def is_package_lost(nrf: RF24):
     # Returns true if package has been lost
 
     if nrf.get_packages_lost() != 0:

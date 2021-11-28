@@ -121,6 +121,7 @@ def wait_hello(radio):
     print("Hello frame received -> num of chunks: " + str(num_chunks))
     return num_chunks
 
+
 def wait_chunk_info(nrf: RF24): 
 
     # Set a positive payload for the next ack
@@ -145,6 +146,7 @@ def wait_chunk_info(nrf: RF24):
     
     return (True, subchunks_num, chunk_id)
 
+
 def wait_data_frame(nrf: RF24):
     # print("")
     # print("ENTERING wait_data_frame: ", datetime.now())
@@ -165,9 +167,11 @@ def wait_data_frame(nrf: RF24):
     data = payload[1:32]
     return (True, data)
 
+
 def set_next_ack(radio: RF24, positive):
     positive_b = 1 if positive else 0 
     radio.writeAckPayload(1, bytearray([positive_b]))
+
 
 def wait_data(radio: RF24):
     has_data, pipe_number = radio.available_pipe()
@@ -179,11 +183,13 @@ def wait_data(radio: RF24):
     length = radio.getDynamicPayloadSize()
     return radio.read(length)
 
+
 def check_frame_type(payload, type):
     if payload[0] != type:
         print("Frame received is not correct type: expected=" + str(type) + ", received=" + str(payload[0]))
         return False
     return True
+
 
 def clean_working_dir(filename):
     try:
@@ -191,6 +197,7 @@ def clean_working_dir(filename):
     except:
         # Directory already clean
         return
+
 
 def write_chunk_to_file(filename, chunk):
     f = open(filename, "ab")
