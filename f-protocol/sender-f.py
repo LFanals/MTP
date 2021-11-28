@@ -202,11 +202,6 @@ def send_subchunk(nrf: RF24, subchunk):
 
     return is_ack_positive(ack_payload)
 
-def send(radio: RF24, payload) -> bool:
-    # Sends the a packet and waits until it is sent
-    # If timeout exideed returns False, True otherwise
-
-    radio.write(payload)
 
 def get_ack_payload(nrf: RF24):
     # Check if an acknowledgement package is available.
