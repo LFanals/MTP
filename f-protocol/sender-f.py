@@ -153,7 +153,7 @@ def send_infinity(radio, payload, check_ack_is_positive):
         if check_ack_is_positive:
             is_positive = is_ack_positive(ack_payload)    
         attempt = attempt + 1
-        time.sleep(utils.RETRY_DELAY)
+        time.sleep(utils.SLEEP_DELAY)
     return ack_payload
 
 
