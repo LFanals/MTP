@@ -107,14 +107,23 @@ def wait_chunk_info(radio, expected_chunk_id):
 
     # Set a positive payload for the next ack
     frame_correct = False
+    count = 0
     while not frame_correct:
-        set_next_ack(radio, True)
+        if count != 0: 
+            set_next_ack(radio, False)
+        else:
+            set_next_ack(radio, True)
         payload = wait_data(radio)
 
         frame_correct = check_chunk_info_frame(payload, expected_chunk_id)
-
+        count = count + 1
+        if frame_correct and count > 1:
+            frame_correct = False
+            count = 0
     (num_subchunks, chunk_id) = get_chunk_info_data(payload)
     print("Chunk_info received -> Chunk id: " + str(chunk_id) + ", num of subchunks: " + str(num_subchunks))
+
+    # Now sender will send again the chunk info frame as the last ack was false
     
     return num_subchunks
 
@@ -178,27 +187,33 @@ def check_hello_frame(payload):
 
 def check_chunk_info_frame(payload, expected_id):
     good_type = check_frame_type(payload, utils.CHUNK_INFO_TYPE)
-    return good_type and payload[3] == expected_id
+    return good_type and check_id(payload[3], expected_id)
 
 
 def check_data_frame(payload, expected_id):
     (type, id) = get_data_frame_type_and_id(payload)
     good_type = type == utils.DATA_TYPE
-    return good_type and id == expected_id
+    return good_type and check_id(id, expected_id)
 
 
 def check_chunk_is_good_frame(payload, expected_id):
     good_type = check_frame_type(payload, utils.CHUNK_IS_GOOD_TYPE)
     chunk_id = int.from_bytes([payload[1], payload[2]], "little")
-    return good_type and chunk_id == expected_id 
+    return good_type and check_id(chunk_id, expected_id)
+
 
 def get_data_frame_type_and_id(payload):
 
     type = payload[0] >> 4 # The 4 left bits
     id = payload[0] & 15 # The 4 right bits
-
     return (type, id)
 
+
+def check_id(id, expected_id):
+    if id != expected_id:
+        print("Frame received doesn't have correct id: expected=" + str(expected_id) + ", received=" + str(id))
+        return False
+    return True
 
 def check_frame_type(payload, type):
     if payload[0] != type:
