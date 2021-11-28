@@ -236,8 +236,10 @@ def clean_working_dir():
 def try_decompress_chunk(chunk_data):
     try:
         decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
+        print("--->Decompression succeed!!")
         return False, decompressed_chunk
     except:
+        print("--->Decompression failed!!")
         return False, -1
 
 def write_chunk_to_file(filename, chunk):
