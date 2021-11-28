@@ -36,22 +36,25 @@ def start_sender(chunk_size):
     send_hello(radio, len(chunks))
 
     # Start sending the data frames
-    for chunk_id in range(len(chunks)):
+    chunk_id = 0
+    while chunk_id < range(len(chunks)):
         chunk_is_good = False
-        while not chunk_is_good:
-            subchunk_num = len(subchunks[chunk_id])
-            send_chunk_info(radio, subchunk_num, chunk_id)
-            
-            # Receiver is ready to receive the data frames
-            count = 0
-            for subchunk in subchunks[chunk_id]:
-                send_subchunk(radio, subchunk)
-                count = count + 1
-                if count !=0 and count % 25 == 0: print("Sent until subchunk " + str(count))
+        subchunk_num = len(subchunks[chunk_id])
+        send_chunk_info(radio, subchunk_num, chunk_id)
+        
+        # Receiver is ready to receive the data frames
+        count = 0
+        for subchunk in subchunks[chunk_id]:
+            send_subchunk(radio, subchunk)
+            count = count + 1
+            if count !=0 and count % 25 == 0: print("Sent until subchunk " + str(count))
 
-            chunk_is_good = send_chunk_is_good(radio, chunk_id)
-            if not chunk_is_good:
-                print("Chunk was not good sending again chunk id: " + str(chunk_id))
+        chunk_is_good, expected_id = send_chunk_is_good(radio, chunk_id)
+        if not chunk_is_good:
+            print("Chunk was not good sending again chunk id: " + str(expected_id))
+            chunk_id = expected_id
+        else:
+            chunk_id += chunk_id
 
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
@@ -119,7 +122,7 @@ def send_chunk_is_good(radio: RF24, chunk_id):
     print("Sending chunk is good frame -> chunk id: " + str(chunk_id))
     payload = packet_creator.create_chunk_is_good_frame(chunk_id)
     ack_payload = send_infinity(radio, payload, False)
-    return is_ack_positive(ack_payload)
+    return (is_ack_positive(ack_payload), get_expected_chunk_id(ack_payload))
 
 def get_ack_payload(nrf: RF24):
     # Check if an acknowledgement package is available.
@@ -150,6 +153,9 @@ def is_ack_positive(ack_payload):
     except:
         return False
     return False
+
+def get_expected_chunk_id(ack_payload):
+    return ack_payload[1]
 
 
 def send_infinity(radio, payload, check_ack_is_positive):

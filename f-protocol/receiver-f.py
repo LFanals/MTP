@@ -110,9 +110,9 @@ def wait_chunk_info(radio, expected_chunk_id):
     count = 0
     while not frame_correct:
         if count != 0: 
-            set_next_ack(radio, False)
+            set_next_ack(radio, False, expected_chunk_id)
         else:
-            set_next_ack(radio, True)
+            set_next_ack(radio, True, expected_chunk_id)
         payload = wait_data(radio)
 
         frame_correct = check_chunk_info_frame(payload, expected_chunk_id)
@@ -142,23 +142,23 @@ def wait_data_frame(radio: RF24, expected_id):
 
     return payload[1:32]
 
-def wait_chunk_is_good_frame(radio: RF24, chunk_is_good, chunk_id):
+def wait_chunk_is_good_frame(radio: RF24, chunk_is_good, expected_chunk_id):
 
     frame_correct = False
     while not frame_correct:
-        set_next_ack(radio, chunk_is_good)
+        set_next_ack(radio, chunk_is_good, expected_chunk_id)
         payload = wait_data(radio)
 
-        frame_correct = check_chunk_is_good_frame(payload, chunk_id)
+        frame_correct = check_chunk_is_good_frame(payload, expected_chunk_id)
         if not frame_correct: 
             print("frame incorrect, waiting again")
 
-    print("Chunk is good received -> Chunk id: " + str(chunk_id))
+    print("Chunk is good received -> Chunk id: " + str(expected_chunk_id))
     
 
-def set_next_ack(radio: RF24, positive):
+def set_next_ack(radio: RF24, positive, chunk_id = -1):
     positive_b = 1 if positive else 0 
-    radio.writeAckPayload(1, bytearray([positive_b]))
+    radio.writeAckPayload(1, bytearray([positive_b, chunk_id]))
 
 
 def wait_data(radio: RF24):
@@ -211,13 +211,13 @@ def get_data_frame_type_and_id(payload):
 
 def check_id(id, expected_id):
     if id != expected_id:
-        print("Frame received doesn't have correct id: expected=" + str(expected_id) + ", received=" + str(id))
+        print("Wrong id: expected=" + str(expected_id) + ", received=" + str(id))
         return False
     return True
 
 def check_frame_type(payload, type):
     if payload[0] != type:
-        print("Frame received is not correct type: expected=" + str(type) + ", received=" + str(payload[0]))
+        print("Wrong type: expected=" + str(type) + ", received=" + str(payload[0]))
         return False
     return True
 
