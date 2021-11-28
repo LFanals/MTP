@@ -1,3 +1,13 @@
+# General imports
+import subprocess
+import time
+from datetime import datetime
+import os
+import sys
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+
 # Local files imports
 from ..common import chunk_handler
 from ..common import utils
@@ -5,12 +15,7 @@ from ..common import utils
 # nrf24 library import
 import RF24
 
-# General imports
-import subprocess
-import time
-from datetime import datetime
-import os
-import sys
+
 
 def start_receiver():
     print("Starting receiver")
@@ -63,7 +68,7 @@ def start_receiver():
                 # TODO: handle case when packet received is not a data frame
                 sys.exit()
             
-            if (subchunk_id is not 0) and (not subchunk_id%10):
+            if (subchunk_id != 0) and (not subchunk_id%10):
                 print("Received until subchunk " + str(subchunk_id))
             
             # Add the data to the chunk data bytearray
