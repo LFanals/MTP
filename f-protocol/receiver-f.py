@@ -49,7 +49,6 @@ def start_receiver():
                 
                 if subchunk_id != 0 and subchunk_id % 50 == 0:
                     print("Received until subchunk " + str(subchunk_id), end="\r")
-                
                 chunk_data.extend(data)
             
             chunk_is_good, decompressed_chunk = try_decompress_chunk(chunk_data)
@@ -141,7 +140,7 @@ def wait_data_frame(radio: RF24, expected_id):
 
         frame_correct = check_data_frame(payload, expected_id)
         if not frame_correct: 
-            print("Wrong data frame, waiting again")
+            print("Wrong data frame, waiting again", "\r")
 
     return payload[1:32]
 
