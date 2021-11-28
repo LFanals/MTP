@@ -167,7 +167,7 @@ def wait_data_frame(nrf: RF24):
 
 def set_next_ack(radio: RF24, positive):
     positive_b = 1 if positive else 0 
-    radio.writeAckPayload(1, positive_b)
+    radio.writeAckPayload(1, bytearray([positive_b]))
 
 def wait_data(radio: RF24):
     has_data, pipe_number = radio.available_pipe()
