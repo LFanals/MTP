@@ -5,7 +5,7 @@ import sys
 
 HELLO_PREFIX = 0
 CHUNK_INFO_PREFIX = 1
-DATA_PREFIX = b'\x02'
+DATA_PREFIX = 2
 SUBCHUNK_SIZE = 31
 PAYLOAD_SIZE = 32
 
@@ -59,7 +59,7 @@ def create_data_frames(chunk_list):
         rts_subchunk_list = []
         for i in range(len(subchunk_list)):
             # Insert "type" prefix at position 0
-            subchunk = bytearray(DATA_PREFIX) + subchunk_list[i]
+            subchunk = data_type_and_id_to_byte() + subchunk_list[i]
 
             # 0 padding if necessary
             subchunk = zero_padd_list(subchunk, SUBCHUNK_SIZE)
@@ -72,7 +72,9 @@ def create_data_frames(chunk_list):
     
     return rts_chunk_list
 
-
+def data_type_and_id_to_byte(id):
+    id = id % 15 # Data id will be module 15 to fit in the 4 right bits
+    return bytearray([DATA_PREFIX << 4 | id ])
 
 def main():
     chunk_amount = 100

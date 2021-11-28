@@ -124,7 +124,8 @@ def wait_chunk_info(radio, expected_chunk_id):
 
 
 def wait_data_frame(radio: RF24, expected_id):
-    print("Expecting subchank: "+str(expected_id))
+    expected_id = expected_id % 15
+
     frame_correct = False
     while not frame_correct:
         set_next_ack(radio, True)
@@ -170,7 +171,17 @@ def check_chunk_info_frame(payload, expected_id):
 
 
 def check_data_frame(payload, expected_id):
-    return check_frame_type(payload, utils.DATA_TYPE)
+    (type, id) = get_data_frame_type_and_id(payload)
+    ret_val = type == utils.DATA_TYPE
+    print("received id: " + str(id) + ", expected id: " + str(expected_id))
+    return ret_val & id == expected_id
+
+def get_data_frame_type_and_id(payload):
+
+    type = payload[0] << 4 # The 4 left bits
+    id = payload[0] & 15 # The 4 right bits
+
+    return (type, id)
 
 
 def check_frame_type(payload, type):
