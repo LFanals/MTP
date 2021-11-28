@@ -236,7 +236,7 @@ def try_decompress_chunk(chunk_data):
     try:
         decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
         print("Decompression succeed!!")
-        return False, decompressed_chunk
+        return True, decompressed_chunk
     except:
         print("Decompression failed!!")
         return False, -1
