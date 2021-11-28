@@ -22,7 +22,7 @@ CE_PIN = 25
 IRQ_PIN = 0
 
 # Protocol configuration
-CHUNKS_SIZE = 50
+CHUNKS_SIZE = 10
 SLEEP_DELAY = 0.0001
 COMPRESSION_LEVEL = 9
 
