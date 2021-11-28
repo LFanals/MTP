@@ -122,13 +122,12 @@ def wait_chunk_info(radio, expected_chunk_id):
             print("Wrong chunk_info, waiting again")
         count = count + 1
         if frame_correct and count > 1:
+            print("Frame info was correct but expect another one")
             frame_correct = False
             count = 0
     (num_subchunks, chunk_id) = get_chunk_info_data(payload)
     print("Chunk_info received -> Chunk id: " + str(chunk_id) + ", num of subchunks: " + str(num_subchunks))
 
-    # Now sender will send again the chunk info frame as the last ack was false
-    
     return num_subchunks
 
 
@@ -236,10 +235,10 @@ def clean_working_dir():
 def try_decompress_chunk(chunk_data):
     try:
         decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
-        print("--->Decompression succeed!!")
+        print("Decompression succeed!!")
         return False, decompressed_chunk
     except:
-        print("--->Decompression failed!!")
+        print("Decompression failed!!")
         return False, -1
 
 def write_chunk_to_file(filename, chunk):
