@@ -112,11 +112,14 @@ def send_infinity(radio, payload, check_ack_is_positive):
 
     success, ack_payload = send(radio, payload)
     is_positive = True
+
     if check_ack_is_positive:
         is_positive = is_ack_positive(ack_payload)    
+
     while not success or not is_positive: 
         print("Retrying. Attempt: " + str(attempt))
         success, ack_payload = send(radio, payload)
+        attempt = attempt + 1
         time.sleep(utils.RETRY_DELAY)
     return ack_payload
 
