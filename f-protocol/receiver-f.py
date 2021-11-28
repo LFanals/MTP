@@ -54,13 +54,11 @@ def start_receiver():
             # Add the data to the chunk data bytearray
             chunk_data.extend(data)
         
-        # We don't set the following ack to positive to ensure that sender waits until decompression and writing is finished
-
-        # All subchunks of chunk have been received. Decompress and save to file
-        # for testing purposes we just print it to console
-        print("------------chunk id: " + str(i) + "----------------")
-        #decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
-        # print(decompressed_chunk)
+        success, decompressed_data = try_decompress_chunk(chunk_data)
+        wait_chunk_is_good_frame(success)
+        if not success:
+            print("Chunk was not good expecting to receive again chunk id: " + str(i))
+            i = i - 1
         #write_chunk_to_file(filename, decompressed_chunk)        
 
     radio.stopListening()
@@ -135,8 +133,21 @@ def wait_data_frame(radio: RF24, expected_id):
         if not frame_correct: 
             print("frame incorrect, waiting again")
 
-
     return payload[1:32]
+
+def wait_chunk_is_good_frame(radio: RF24, success, chunk_id):
+
+    frame_correct = False
+    while not frame_correct:
+        set_next_ack(radio, success)
+        payload = wait_data(radio)
+
+        frame_correct = check_chunk_is_good_frame(payload, chunk_id)
+        if not frame_correct: 
+            print("frame incorrect, waiting again")
+
+    print("Chunk is good received -> Chunk id: " + str(chunk_id))
+    
 
 def set_next_ack(radio: RF24, positive):
     positive_b = 1 if positive else 0 
@@ -168,14 +179,20 @@ def check_hello_frame(payload):
 
 
 def check_chunk_info_frame(payload, expected_id):
-    ret_val = check_frame_type(payload, utils.CHUNK_INFO_TYPE)
-    return ret_val and payload[3] == expected_id
+    good_type = check_frame_type(payload, utils.CHUNK_INFO_TYPE)
+    return good_type and payload[3] == expected_id
 
 
 def check_data_frame(payload, expected_id):
     (type, id) = get_data_frame_type_and_id(payload)
-    ret_val = type == utils.DATA_TYPE
-    return ret_val and id == expected_id
+    good_type = type == utils.DATA_TYPE
+    return good_type and id == expected_id
+
+
+def check_chunk_is_good_frame(payload, expected_id):
+    good_type = check_frame_type(payload, utils.CHUNK_IS_GOOD_TYPE)
+    chunk_id = int.from_bytes([payload[1], payload[2]], "little")
+    return good_type and chunk_id == expected_id 
 
 def get_data_frame_type_and_id(payload):
 
@@ -198,6 +215,13 @@ def clean_working_dir():
         # Directory already clean
         return
 
+
+def try_decompress_chunk(chunk_data):
+    try:
+        decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
+        return True, decompressed_chunk
+    except:
+        return False, -1
 
 def write_chunk_to_file(filename, chunk):
     f = open(filename, "ab")

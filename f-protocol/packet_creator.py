@@ -6,6 +6,7 @@ import sys
 HELLO_PREFIX = 0
 CHUNK_INFO_PREFIX = 1
 DATA_PREFIX = 2
+CHUNK_IS_GOOD_PREFIX = 3
 SUBCHUNK_SIZE = 31
 PAYLOAD_SIZE = 32
 
@@ -71,6 +72,15 @@ def create_data_frames(chunk_list):
         rts_chunk_list.append(rts_subchunk_list)
     
     return rts_chunk_list
+
+
+def create_chunk_is_good_frame(chunk_id):
+    print("Creating Chunk_Is_Good Frame for chunk id: "+str(chunk_id))
+    b_chunk_id = chunk_id.to_bytes(2, 'little')
+    frame = [CHUNK_IS_GOOD_PREFIX, b_chunk_id[0], b_chunk_id[1]]
+    frame = zero_padd_list(frame, SUBCHUNK_SIZE)
+    frame = bytearray(frame)
+    return frame
 
 def data_type_and_id_to_byte(id):
     id = id % 15 # Data id will be module 15 to fit in the 4 right bits

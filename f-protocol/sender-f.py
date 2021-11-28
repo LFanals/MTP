@@ -45,8 +45,12 @@ def start_sender(chunk_size):
         for subchunk in subchunks[chunk_id]:
             send_subchunk(radio, subchunk)
             count = count + 1
-            if count !=0 and count % 25 == 0:
-                print("Sent until subchunk " + str(count))
+            if count !=0 and count % 25 == 0: print("Sent until subchunk " + str(count))
+
+        if not send_chunk_is_good(radio):
+            print("Chunk was not good sending again chunk id: " + str(chunk_id))
+            chunk_id = chunk_id - 1
+
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))
@@ -107,6 +111,13 @@ def send_chunk_info(radio: RF24, subchunk_num, chunk_id):
 
 def send_subchunk(radio: RF24, subchunk):
     send_infinity(radio, subchunk, True)
+
+def send_chunk_is_good(radio: RF24, chunk_id):
+
+    print("Sending chunk info frame -> chunk id: " + str(chunk_id))
+    payload = packet_creator.create_chunk_is_good_frame(chunk_id)
+    ack_payload = send_infinity(radio, payload, False)
+    return is_ack_positive(ack_payload)
 
 def get_ack_payload(nrf: RF24):
     # Check if an acknowledgement package is available.
