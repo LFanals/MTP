@@ -169,7 +169,7 @@ def check_hello_frame(payload):
 
 def check_chunk_info_frame(payload, expected_id):
     ret_val = check_frame_type(payload, utils.CHUNK_INFO_TYPE)
-    return ret_val & payload[3] == expected_id
+    return ret_val and payload[3] == expected_id
 
 
 def check_data_frame(payload, expected_id):
@@ -177,7 +177,7 @@ def check_data_frame(payload, expected_id):
     ret_val = type == utils.DATA_TYPE
     print("received id: " + str(id) + ", expected id: " + str(expected_id))
     print("type: " + str(type) + ", id: " + str(id==expected_id))
-    return ret_val & id == expected_id
+    return ret_val and id == expected_id
 
 def get_data_frame_type_and_id(payload):
 
