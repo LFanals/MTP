@@ -175,6 +175,7 @@ def check_data_frame(payload, expected_id):
     (type, id) = get_data_frame_type_and_id(payload)
     ret_val = type == utils.DATA_TYPE
     print("received id: " + str(id) + ", expected id: " + str(expected_id))
+    print("type: " + str(type) + ", id: " + str(id==expected_id))
     return ret_val & id == expected_id
 
 def get_data_frame_type_and_id(payload):
