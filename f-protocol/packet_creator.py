@@ -59,7 +59,7 @@ def create_data_frames(chunk_list):
         rts_subchunk_list = []
         for i in range(len(subchunk_list)):
             # Insert "type" prefix at position 0
-            subchunk = data_type_and_id_to_byte() + subchunk_list[i]
+            subchunk = data_type_and_id_to_byte(i) + subchunk_list[i]
 
             # 0 padding if necessary
             subchunk = zero_padd_list(subchunk, SUBCHUNK_SIZE)
