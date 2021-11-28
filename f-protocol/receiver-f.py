@@ -52,11 +52,12 @@ def start_receiver():
                 
                 chunk_data.extend(data)
             
-            chunk_is_good, decompressed_data = try_decompress_chunk(chunk_data)
+            chunk_is_good, decompressed_chunk = try_decompress_chunk(chunk_data)
             wait_chunk_is_good_frame(radio, chunk_is_good, i)
             if not chunk_is_good:
                 print("Chunk was not good expecting to receive again chunk id: " + str(i))
-            #write_chunk_to_file(filename, decompressed_chunk)        
+            
+        write_chunk_to_file(filename, decompressed_chunk)        
 
     radio.stopListening()
     radio.powerDown()
@@ -216,7 +217,7 @@ def clean_working_dir():
 def try_decompress_chunk(chunk_data):
     try:
         decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
-        return False, decompressed_chunk
+        return True, decompressed_chunk
     except:
         return False, -1
 
