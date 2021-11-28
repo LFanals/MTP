@@ -208,13 +208,13 @@ def get_data_frame_type_and_id(payload):
 
 def check_id(id, expected_id):
     if id != expected_id:
-        print("Wrong id: expected=" + str(expected_id) + ", received=" + str(id))
+        print("Wrong id: expected=" + str(expected_id) + ", received=" + str(id), end="\r")
         return False
     return True
 
 def check_frame_type(type, expected_type):
     if type != expected_type:
-        print("Wrong type: expected=" + str(expected_type) + ", received=" + str(type))
+        print("Wrong type: expected=" + str(expected_type) + ", received=" + str(type), end="\r")
         return False
     return True
 

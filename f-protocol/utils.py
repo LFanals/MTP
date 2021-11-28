@@ -24,7 +24,7 @@ IRQ_PIN = 0
 # Protocol configuration
 CHUNKS_SIZE = 250
 SLEEP_DELAY = 0.0001
-COMPRESSION_LEVEL = 9
+COMPRESSION_LEVEL = 7
 
 
 # Frames types
