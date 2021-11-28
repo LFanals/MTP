@@ -32,17 +32,11 @@ def start_sender(chunk_size):
     subchunks = packet_creator.create_data_frames(chunks)
 
     # Send Hello frame
-    ready = False
-    while not ready:
-        if not send_hello(nrf, len(chunks)):
-            # Hello didn't work 
-            print("Hello didn't work. Sending again hello package...")
-        else:
-            ready = True
-
+    send_hello(radio, len(chunks))
     # Start sending the data frames
     # For each chunk we send a chunk_info frame with the number of subchunks and the chunk id
     # To start sending the subchunks we must receive a positive ack to the chunk_info frame
+    return
     for chunk_id in range(len(chunks)):
         subchunk_num = len(subchunks[chunk_id])
         ready = False
@@ -89,12 +83,19 @@ def setup_sender():
     radio.begin(utils.CE_PIN, utils.IRQ_PIN) #Set CE and IRQ pins
     radio.setPALevel(utils.PA_LEVEL)
     radio.setDataRate(utils.DATA_RATE)
-
     radio.setChannel(utils.CHANNEL)
-    radio.openReadingPipe(1, utils.PIPE)
-    radio.startListening()
-    radio.printDetails()
+    radio.setRetries(utils.RETRY_DELAY,utils.RETRY_COUNT)
 
+    radio.enableDynamicPayloads()  
+    radio.enableAckPayload()
+
+    radio.openWritingPipe(utils.TX_WRITE_PIPE)
+    radio.openReadingPipe(1, utils.RX_WRITE_PIPE)
+
+    radio.powerUp()
+    radio.printPrettyDetails()
+
+    radio.stopListening()  # put radio in TX mode
     return radio
 
 def send_hello(radio: RF24, chunk_num: int) -> bool:
@@ -103,33 +104,36 @@ def send_hello(radio: RF24, chunk_num: int) -> bool:
 
     # Create and send hello frame
     payload = packet_creator.create_hello_frame(chunk_num)
-    print("Sending hello frame -> num of chunks: " + str(chunk_num))
+    send_infinity(radio, payload, True) # We want to retry until we receive a positive ack
+
+def send_infinity(radio, payload, check_ack_is_positive):
     attempt = 1
-    while attempt != 0:
-        if not send(nrf, payload):
-            # TODO: Handle case when timeout is exceeded
-            print("  * Timeout sending hello frame. Retrying transmission. Attempt: " + str(attempt))
-            attempt += 1
 
-        # Get ACK
-        # if is_package_lost(nrf):
-        #     # TODO: Handle package is lost
-        #     print("  * Hello frame lost. Retrying transmission. Attempt: " + str(attempt))
-        #     attempt += 1
+    success, ack_payload = send(radio, payload)
+    is_positive = True
+    if check_ack_is_positive:
+        is_positive = is_ack_positive(ack_payload)    
+    while not success or not is_positive: 
+        print("Retrying. Attempt: " + str(attempt))
+        success, ack_payload = send(radio, payload)
+        time.sleep(utils.RETRY_DELAY)
+    return ack_payload
 
-        # Check if ACK is positive
-        (ack_received, ack_payload) = get_ack_payload(nrf)
-
-        if not ack_received:
-            print("  * ACK for hello frame not received. Retrying transmission. Attempt: " + str(attempt))
-            time.sleep(constants.RETRY_DELAY)
-            attempt += 1
-        
-        else: 
-            attempt = 0
-
-    return is_ack_positive(ack_payload)
-
+def send(radio, payload):
+    
+    if radio.write(payload): # Sends and waits ack (2 layer OSI retries included)
+        print("Success")
+        has_payload, pipe_number = radio.available_pipe()
+        if has_payload:
+            print("Has payload")
+            length = radio.getDynamicPayloadSize()
+            return (True, radio.read(length))
+        else:
+            print("Empty ACK")
+            return (False, -1)
+    else:
+        print("Failed")
+        return (False, -1)
 
 def send_chunk_info(nrf: NRF24, subchunk_num, chunk_id):
     # Sends the chunk info frame, waits for the ack and checks that is it positive
@@ -197,23 +201,11 @@ def send_subchunk(nrf: NRF24, subchunk):
 
     return is_ack_positive(ack_payload)
 
-def send(nrf: NRF24, payload) -> bool:
+def send(radio: RF24, payload) -> bool:
     # Sends the a packet and waits until it is sent
     # If timeout exideed returns False, True otherwise
-    # print("")
-    # print("BEFORE SEND: ", datetime.now())
-    nrf.reset_packages_lost()
-    nrf.send(payload)
 
-    # Wait for transmission to complete.
-    timeout = False
-    # try:
-    #     nrf.wait_until_sent()
-    # except TimeoutError:
-    #     print("Timeout exceeded to send a packet")
-    #     timeout = True
-    # print("AFTER SEND: ", datetime.now())
-    return not timeout
+    radio.write(payload)
 
 def get_ack_payload(nrf: NRF24):
     # Check if an acknowledgement package is available.
@@ -237,9 +229,10 @@ def is_package_lost(nrf: NRF24):
     return False
 
 def is_ack_positive(ack_payload):
-    if ack_payload[0] == 1:
-        # print("Checking ack -> Positive")
-        return True
-
-    print("Checking ack -> Negative")
+    try:
+        if ack_payload[0] == 1:
+            # print("Checking ack -> Positive")
+            return True
+    except:
+        return False
     return False

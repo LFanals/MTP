@@ -44,7 +44,8 @@ for i in range(10):
     print("Successful")
     has_payload, pipe_number = radio.available_pipe()
     if has_payload:
-      print(radio.read(2))
+      length = radio.getDynamicPayloadSize()
+      print(radio.read(length))
     else:
       print("Empty ACK")
   else:

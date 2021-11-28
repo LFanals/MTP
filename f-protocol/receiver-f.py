@@ -1,36 +1,33 @@
-# local imports 
-import protocol_utils as p_utils
-import chunk_handler
-import ioparent
+# Local files imports
+from ..common import chunk_handler
+from ..common import utils
 
 # nrf24 library import
-from nrf24 import *
-import constants
+import RF24
 
-# general imports
+# General imports
+import subprocess
 import time
 from datetime import datetime
-import sys
 import os
-import subprocess
+import sys
 
 def start_receiver():
     print("Starting receiver")
 
     # Setup nrf24
-    nrf = setup_receiver()
+    radio = setup_receiver()
 
     # Clean working directory
-    filename = os.path.join(p_utils.WORKING_DIR, "received.txt")
+    filename = os.path.join(utils.WORKING_DIR, "received.txt")
     print("File to be received: " + filename)
     clean_working_dir(filename)
 
     # Wait for Hello frame
-    (is_hello, num_chunks) = wait_hello(nrf)
-    if not is_hello:
-        # TODO: handle case when first packet received is not a hello frame
-        sys.exit()
+    num_chunks = wait_hello(radio)
     
+    radio.printPrettyDetails()
+    return
     # At this point a positive ack has been sent
     ioparent.control_led(1, True)
     ioparent.control_led(3, True)
@@ -89,48 +86,38 @@ def start_receiver():
 def setup_receiver():
     print("Setting up the NRF24 configuration")
 
-    hostname = "localhost"
-    port = 8888
-    address = p_utils.ADDRESS
+    radio = RF24.RF24(utils.SPI_SPEED)
+    radio.begin(utils.CE_PIN, utils.IRQ_PIN) #Set CE and IRQ pins
+    radio.setPALevel(utils.PA_LEVEL)
+    radio.setDataRate(utils.DATA_RATE)
+    radio.setChannel(utils.CHANNEL)
+    radio.setRetries(utils.RETRY_DELAY,utils.RETRY_COUNT)
 
-    pi = p_utils.connect_to_gpio(hostname, port)
+    radio.enableDynamicPayloads()  
+    radio.enableAckPayload()
 
-    nrf = create_receiver_nrf(pi, address)
+    radio.openWritingPipe(utils.RX_WRITE_PIPE)
+    radio.openReadingPipe(1, utils.TX_WRITE_PIPE)
 
-    return nrf
+    radio.powerUp()
+    radio.printPrettyDetails()
+
+    radio.startListening()
+    return radio
 
 
-def create_receiver_nrf(pi, address):
-    # Create NRF24 object.
-    # PLEASE NOTE: PA level is set to MIN, because test sender/receivers are often close to each other, and then MIN works better.
-    # ALSO NOTE: pauload size is set to ACK. That means that payload is variable and acks can contain payload as well
-    nrf = NRF24(pi, ce=25, spi_speed=constants.SPI_SPEED, payload_size=constants.PAYLOAD_SIZE, channel=constants.CHANNEL, data_rate=constants.DATA_RATE, pa_level=constants.PA_LEVEL)
-    nrf.set_address_bytes(len(address))
+def wait_hello(radio):
 
-    # Listen on the address specified as parameter
-    nrf.open_reading_pipe(RF24_RX_ADDR.P1, address)
+    frame_correct = False
+    while not frame_correct:
+        set_next_ack(radio, True)
+        payload = wait_data(radio)
     
-    # Display the content of NRF24L01 device registers.
-    nrf.show_registers()
-
-    return nrf
-
-def wait_hello(nrf: NRF24):
-
-    # Set a positive payload for the next ack
-    set_next_ack(nrf, True)
-    wait_data(nrf)
-    
-    # Data is available, check it is hello frame
-    payload = nrf.get_payload()
-    if payload[0] != 0x00:
-        print("Frame received is not a hello frame: payload[0] = " + str(payload[0]))
-        return (False, -1)
+        frame_correct = check_frame_type(payload, utils.HELLO_TYPE)
 
     num_chunks = int.from_bytes([payload[1], payload[2]], "little")
     print("Hello frame received -> num of chunks: " + str(num_chunks))
-
-    return (True, num_chunks)
+    return num_chunks
 
 def wait_chunk_info(nrf: NRF24): 
 
@@ -176,16 +163,25 @@ def wait_data_frame(nrf: NRF24):
     data = payload[1:32]
     return (True, data)
 
-def set_next_ack(nrf: NRF24, positive):
-    if positive:
-        nrf.ack_payload(RF24_RX_ADDR.P1, bytes([1]))
-    else:
-        nrf.ack_payload(RF24_RX_ADDR.P1, bytes([0]))
+def set_next_ack(radio: RF24, positive):
+    positive_b = 1 if positive else 0 
+    radio.writeAckPayload(1, positive_b)
 
-def wait_data(nrf: NRF24):
-    # print("Waiting for new data...")
-    while not nrf.data_ready():
-        time.sleep(constants.RETRY_DELAY)
+def wait_data(radio: RF24):
+    has_data, pipe_number = radio.available_pipe()
+    # TODO: Implement timeout to wait
+    while not has_data:
+        has_data, pipe_number = radio.available_pipe()
+        time.sleep(0.000001)
+
+    length = radio.getDynamicPayloadSize()
+    return radio.read(length)
+
+def check_frame_type(payload, type):
+    if payload[0] != type:
+        print("Frame received is not correct type: expected=" + str(type) + ", received=" + str(payload[0]))
+        return False
+    return True
 
 def clean_working_dir(filename):
     try:
