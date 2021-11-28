@@ -196,3 +196,7 @@ def write_chunk_to_file(filename, chunk):
     f = open(filename, "ab")
     f.write(chunk)
     f.close()
+
+
+if __name__ == "__main__":
+    start_receiver()
