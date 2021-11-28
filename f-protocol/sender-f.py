@@ -37,19 +37,21 @@ def start_sender(chunk_size):
 
     # Start sending the data frames
     for chunk_id in range(len(chunks)):
-        subchunk_num = len(subchunks[chunk_id])
-        send_chunk_info(radio, subchunk_num, chunk_id)
-        
-        # Receiver is ready to receive the data frames
-        count = 0
-        for subchunk in subchunks[chunk_id]:
-            send_subchunk(radio, subchunk)
-            count = count + 1
-            if count !=0 and count % 25 == 0: print("Sent until subchunk " + str(count))
+        chunk_is_good = False
+        while not chunk_is_good:
+            subchunk_num = len(subchunks[chunk_id])
+            send_chunk_info(radio, subchunk_num, chunk_id)
+            
+            # Receiver is ready to receive the data frames
+            count = 0
+            for subchunk in subchunks[chunk_id]:
+                send_subchunk(radio, subchunk)
+                count = count + 1
+                if count !=0 and count % 25 == 0: print("Sent until subchunk " + str(count))
 
-        if not send_chunk_is_good(radio, chunk_id):
-            print("Chunk was not good sending again chunk id: " + str(chunk_id))
-            chunk_id = chunk_id - 1
+            chunk_is_good = send_chunk_is_good(radio, chunk_id)
+            if not chunk_is_good:
+                print("Chunk was not good sending again chunk id: " + str(chunk_id))
 
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()

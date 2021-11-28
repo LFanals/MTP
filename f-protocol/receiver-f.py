@@ -32,34 +32,31 @@ def start_receiver():
     #ioparent.control_led(3, True)
 
     for i in range(num_chunks):
-        
-        # LEDs 3, 4 and 5 will indicate the received percentage
-        #if i > 2*num_chunks/3: 
-        #    ioparent.control_led(4, True)
-        #elif i >= num_chunks - 1:
-        #    ioparent.control_led(5, True)
+        chunk_is_good = False
+        while not chunk_is_good:
+            # LEDs 3, 4 and 5 will indicate the received percentage
+            #if i > 2*num_chunks/3: 
+            #    ioparent.control_led(4, True)
+            #elif i >= num_chunks - 1:
+            #    ioparent.control_led(5, True)
 
-
-        chunk_data = bytearray()
-        # Wait for chunk_info
-        num_subchunks = wait_chunk_info(radio, i)
-        
-        
-        for subchunk_id in range(num_subchunks):
-            data = wait_data_frame(radio, subchunk_id)
+            chunk_data = bytearray()
+            # Wait for chunk_info
+            num_subchunks = wait_chunk_info(radio, i)
             
-            if subchunk_id != 0 and subchunk_id%25 == 0:
-                print("Received until subchunk " + str(subchunk_id))
+            for subchunk_id in range(num_subchunks):
+                data = wait_data_frame(radio, subchunk_id)
+                
+                if subchunk_id != 0 and subchunk_id%25 == 0:
+                    print("Received until subchunk " + str(subchunk_id))
+                
+                chunk_data.extend(data)
             
-            # Add the data to the chunk data bytearray
-            chunk_data.extend(data)
-        
-        success, decompressed_data = try_decompress_chunk(chunk_data)
-        wait_chunk_is_good_frame(radio, success, i)
-        if not success:
-            print("Chunk was not good expecting to receive again chunk id: " + str(i))
-            i = i - 1
-        #write_chunk_to_file(filename, decompressed_chunk)        
+            chunk_is_good, decompressed_data = try_decompress_chunk(chunk_data)
+            wait_chunk_is_good_frame(radio, chunk_is_good, i)
+            if not chunk_is_good:
+                print("Chunk was not good expecting to receive again chunk id: " + str(i))
+            #write_chunk_to_file(filename, decompressed_chunk)        
 
     radio.stopListening()
     radio.powerDown()
@@ -135,11 +132,11 @@ def wait_data_frame(radio: RF24, expected_id):
 
     return payload[1:32]
 
-def wait_chunk_is_good_frame(radio: RF24, success, chunk_id):
+def wait_chunk_is_good_frame(radio: RF24, chunk_is_good, chunk_id):
 
     frame_correct = False
     while not frame_correct:
-        set_next_ack(radio, False)
+        set_next_ack(radio, chunk_is_good)
         payload = wait_data(radio)
 
         frame_correct = check_chunk_is_good_frame(payload, chunk_id)
@@ -219,7 +216,7 @@ def clean_working_dir():
 def try_decompress_chunk(chunk_data):
     try:
         decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
-        return True, decompressed_chunk
+        return False, decompressed_chunk
     except:
         return False, -1
 
