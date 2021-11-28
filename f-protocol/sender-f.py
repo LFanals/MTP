@@ -47,7 +47,7 @@ def start_sender(chunk_size):
             count = count + 1
             if count !=0 and count % 25 == 0: print("Sent until subchunk " + str(count))
 
-        if not send_chunk_is_good(radio):
+        if not send_chunk_is_good(radio, chunk_id):
             print("Chunk was not good sending again chunk id: " + str(chunk_id))
             chunk_id = chunk_id - 1
 

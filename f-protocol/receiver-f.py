@@ -55,7 +55,7 @@ def start_receiver():
             chunk_data.extend(data)
         
         success, decompressed_data = try_decompress_chunk(chunk_data)
-        wait_chunk_is_good_frame(success)
+        wait_chunk_is_good_frame(radio, success, i)
         if not success:
             print("Chunk was not good expecting to receive again chunk id: " + str(i))
             i = i - 1
