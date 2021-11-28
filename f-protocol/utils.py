@@ -1,5 +1,4 @@
 # General imports
-import pigpio
 import sys
 from os.path import expanduser
 import RF24
@@ -36,12 +35,3 @@ CHUNK_IS_GOOD_TYPE = 3
 
 # Others
 WORKING_DIR = expanduser("~") + "/working-directory"
-
-def connect_to_gpio(hostname, port):
-    # Connect to pigpiod
-    print(f'Connecting to GPIO daemon on {hostname}:{port} ...')
-    pi = pigpio.pi(hostname, port)
-    if not pi.connected:
-        print("Not connected to Raspberry Pi ... goodbye.")
-        sys.exit()
-    return pi
