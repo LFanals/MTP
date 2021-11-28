@@ -48,7 +48,7 @@ def start_receiver():
                 data = wait_data_frame(radio, subchunk_id)
                 
                 if subchunk_id != 0 and subchunk_id % 50 == 0:
-                    print("Received until subchunk " + str(subchunk_id))
+                    print("Received until subchunk " + str(subchunk_id), end="\r")
                 
                 chunk_data.extend(data)
             
