@@ -97,6 +97,8 @@ def wait_hello(radio):
         payload = wait_data(radio)
     
         frame_correct = check_hello_frame(payload)
+        if not frame_correct:
+            print("Wrong hello frame, waiting again")
 
     num_chunks = int.from_bytes([payload[1], payload[2]], "little")
     print("Hello frame received -> num of chunks: " + str(num_chunks))
@@ -116,6 +118,8 @@ def wait_chunk_info(radio, expected_chunk_id):
         payload = wait_data(radio)
 
         frame_correct = check_chunk_info_frame(payload, expected_chunk_id)
+        if not frame_correct:
+            print("Wrong chunk_info, waiting again")
         count = count + 1
         if frame_correct and count > 1:
             frame_correct = False
@@ -138,7 +142,7 @@ def wait_data_frame(radio: RF24, expected_id):
 
         frame_correct = check_data_frame(payload, expected_id)
         if not frame_correct: 
-            print("frame incorrect, waiting again")
+            print("Wrong data frame, waiting again")
 
     return payload[1:32]
 
@@ -151,7 +155,7 @@ def wait_chunk_is_good_frame(radio: RF24, chunk_is_good, expected_chunk_id):
 
         frame_correct = check_chunk_is_good_frame(payload, expected_chunk_id)
         if not frame_correct: 
-            print("frame incorrect, waiting again")
+            print("Wrong chunk_is_good, waiting again")
 
     print("Chunk is good received -> Chunk id: " + str(expected_chunk_id))
     
