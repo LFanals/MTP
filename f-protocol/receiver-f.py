@@ -140,6 +140,7 @@ def wait_data_frame(radio: RF24, expected_id):
 
     return payload[1:32]
 
+
 def wait_chunk_is_good_frame(radio: RF24, chunk_is_good, expected_chunk_id):
 
     frame_correct = False
@@ -169,6 +170,7 @@ def get_chunk_info_data(payload):
     subchunks_num = int.from_bytes([payload[1], payload[2]], "little")
     chunk_id = payload[3] 
     return (subchunks_num, chunk_id)
+
 
 def get_data_frame_data(payload):
     return payload[1:32]
@@ -208,11 +210,13 @@ def check_id(id, expected_id):
         return False
     return True
 
+
 def check_frame_type(type, expected_type):
     if type != expected_type:
         print("Wrong type: expected=" + str(expected_type) + ", received=" + str(type))
         return False
     return True
+
 
 def set_next_ack(radio: RF24, positive, chunk_id = 0):
     positive_b = 1 if positive else 0 
@@ -235,6 +239,7 @@ def try_decompress_chunk(chunk_data):
     except:
         print("Decompression failed!!")
         return False, -1
+
 
 def write_chunk_to_file(filename, chunk):
     f = open(filename, "ab")

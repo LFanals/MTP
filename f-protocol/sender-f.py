@@ -125,31 +125,9 @@ def send_chunk_is_good(radio: RF24, chunk_id):
     ack_payload = send_infinity(radio, payload, False)
     return (is_ack_positive(ack_payload), get_expected_chunk_id(ack_payload))
 
-def get_ack_payload(nrf: RF24):
-    # Check if an acknowledgement package is available.
-    if nrf.data_ready():
-        # Get payload.
-        payload = nrf.get_payload()
-        #print("ACK payload: " + str(payload))
-        return (True, payload)
-
-    else:
-        # print("No acknowledgement payload package received.")å
-        # TODO: Handle this case when the ack doesn't arrive 
-        return (False, -1)
-
-def is_package_lost(nrf: RF24):
-    # Returns true if package has been lost
-
-    if nrf.get_packages_lost() != 0:
-        print("Package is lost")
-        return True
-    return False
-
 def is_ack_positive(ack_payload):
     try:
         if ack_payload[0] == 1:
-            # print("Checking ack -> Positive")
             return True
     except:
         return False
