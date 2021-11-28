@@ -139,7 +139,7 @@ def wait_chunk_is_good_frame(radio: RF24, success, chunk_id):
 
     frame_correct = False
     while not frame_correct:
-        set_next_ack(radio, success)
+        set_next_ack(radio, False)
         payload = wait_data(radio)
 
         frame_correct = check_chunk_is_good_frame(payload, chunk_id)
