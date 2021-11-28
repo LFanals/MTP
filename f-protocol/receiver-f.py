@@ -121,7 +121,7 @@ def wait_hello(radio):
     print("Hello frame received -> num of chunks: " + str(num_chunks))
     return num_chunks
 
-def wait_chunk_info(nrf: NRF24): 
+def wait_chunk_info(nrf: RF24): 
 
     # Set a positive payload for the next ack
     set_next_ack(nrf, True)
@@ -145,7 +145,7 @@ def wait_chunk_info(nrf: NRF24):
     
     return (True, subchunks_num, chunk_id)
 
-def wait_data_frame(nrf: NRF24):
+def wait_data_frame(nrf: RF24):
     # print("")
     # print("ENTERING wait_data_frame: ", datetime.now())
     # Set a positive payload for the next ack
