@@ -13,6 +13,7 @@ import utils
 import RF24
 
 
+filename = os.path.join(utils.WORKING_DIR, "received.txt")
 
 def start_receiver():
     print("Starting receiver")
@@ -21,7 +22,7 @@ def start_receiver():
     radio = setup_receiver()
 
     # Clean working directory
-    filename = clean_working_dir()
+    clean_working_dir()
 
     # Wait for Hello frame
     num_chunks = wait_hello(radio)
@@ -177,15 +178,12 @@ def check_frame_type(payload, type):
         return False
     return True
 
-def clean_working_dir(filename):
-    filename = os.path.join(utils.WORKING_DIR, "received.txt")
-    print("File to be received: " + filename)
+def clean_working_dir():
     try:
         os.remove(filename)
     except:
         # Directory already clean
         return
-    return filename
 
 
 def write_chunk_to_file(filename, chunk):
