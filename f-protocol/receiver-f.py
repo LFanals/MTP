@@ -181,7 +181,7 @@ def check_data_frame(payload, expected_id):
 
 def get_data_frame_type_and_id(payload):
 
-    type = payload[0] << 4 # The 4 left bits
+    type = payload[0] >> 4 # The 4 left bits
     id = payload[0] & 15 # The 4 right bits
 
     return (type, id)
