@@ -52,7 +52,7 @@ def start_receiver():
                 print("Received until subchunk " + str(subchunk_id))
             
             # Add the data to the chunk data bytearray
-            chunk_data.extend(data)
+            #chunk_data.extend(data)
         
         # We don't set the following ack to positive to ensure that sender waits until decompression and writing is finished
 
