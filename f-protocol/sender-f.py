@@ -112,11 +112,11 @@ def send_chunk_info(radio: RF24, subchunk_num, chunk_id):
     send_infinity(radio, payload, True)
 
 def send_subchunk(radio: RF24, subchunk):
-    send_infinity(radio, subchunk, True)
+    send_infinity(radio, subchunk, False)
 
 def send_chunk_is_good(radio: RF24, chunk_id):
 
-    print("Sending chunk info frame -> chunk id: " + str(chunk_id))
+    print("Sending chunk is good frame -> chunk id: " + str(chunk_id))
     payload = packet_creator.create_chunk_is_good_frame(chunk_id)
     ack_payload = send_infinity(radio, payload, False)
     return is_ack_positive(ack_payload)
