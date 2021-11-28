@@ -43,7 +43,7 @@ def start_sender(chunk_size):
         # Receiver is ready to receive the data frames
         count = 0
         for subchunk in subchunks[chunk_id]:
-            print("Sending subchunk: " + count)
+            print("Sending subchunk: " + str(count))
             send_subchunk(radio, subchunk)
             count = count + 1
     print("Reached end of program. In theory all data has been sent correctly")
