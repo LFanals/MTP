@@ -21,9 +21,7 @@ def start_receiver():
     radio = setup_receiver()
 
     # Clean working directory
-    filename = os.path.join(utils.WORKING_DIR, "received.txt")
-    print("File to be received: " + filename)
-    clean_working_dir(filename)
+    filename = clean_working_dir()
 
     # Wait for Hello frame
     num_chunks = wait_hello(radio)
@@ -43,14 +41,11 @@ def start_receiver():
 
         chunk_data = bytearray()
         # Wait for chunk_info
-        wait_chunk_info(radio, i)
+        num_subchunks = wait_chunk_info(radio, i)
         
-        break
+        
         for subchunk_id in range(num_subchunks):
-            (is_data_frame, data) = wait_data_frame(nrf)
-            if not is_data_frame:
-                # TODO: handle case when packet received is not a data frame
-                sys.exit()
+            data = wait_data_frame(radio)
             
             if (subchunk_id != 0) and (not subchunk_id%10):
                 print("Received until subchunk " + str(subchunk_id))
@@ -62,10 +57,10 @@ def start_receiver():
 
         # All subchunks of chunk have been received. Decompress and save to file
         # for testing purposes we just print it to console
-        print("------------chunk id: " + str(chunk_id) + "----------------")
-        decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
+        print("------------chunk id: " + str(i) + "----------------")
+        #decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
         # print(decompressed_chunk)
-        write_chunk_to_file(filename, decompressed_chunk)        
+        #write_chunk_to_file(filename, decompressed_chunk)        
 
     radio.stopListening()
     radio.powerDown()
@@ -121,32 +116,22 @@ def wait_chunk_info(radio, expected_chunk_id):
 
         frame_correct = check_chunk_info_frame(payload, expected_chunk_id)
 
-    (subchunks_num, chunk_id) = get_chunk_info_data(payload)
-    print("Chunk_info received -> Chunk id: " + str(chunk_id) + ", num of subchunks: " + str(subchunks_num))
+    (num_subchunks, chunk_id) = get_chunk_info_data(payload)
+    print("Chunk_info received -> Chunk id: " + str(chunk_id) + ", num of subchunks: " + str(num_subchunks))
     
-    return (True, subchunks_num)
+    return num_subchunks
 
 
-def wait_data_frame(nrf: RF24):
-    # print("")
-    # print("ENTERING wait_data_frame: ", datetime.now())
-    # Set a positive payload for the next ack
-    set_next_ack(nrf, True)
-    # print("ACK SET: ", datetime.now())
+def wait_data_frame(radio: RF24, expected_id):
+    frame_correct = False
+    while not frame_correct:
+        set_next_ack(radio, True)
+        payload = wait_data(radio)
 
-    wait_data(nrf)
-    # print("DATA RECEIVED", datetime.now())
-    # Data is available, check it is data frame
-    payload = nrf.get_payload()
-    if payload[0] != 0x02:
-        print("Frame received is not a data frame: payload[0] = " + str(payload[0]))
-        return (False, -1)
-    # print("PAYLOAD READ: ", datetime.now())
+        frame_correct = check_data_frame(payload, expected_id)
 
-    # Get data (bytes from position 1 until end)
-    data = payload[1:32]
-    return (True, data)
 
+    return payload[1:32]
 
 def set_next_ack(radio: RF24, positive):
     positive_b = 1 if positive else 0 
@@ -163,10 +148,15 @@ def wait_data(radio: RF24):
     length = radio.getDynamicPayloadSize()
     return radio.read(length)
 
+
 def get_chunk_info_data(payload):
     subchunks_num = int.from_bytes([payload[1], payload[2]], "little")
     chunk_id = payload[3] 
     return (subchunks_num, chunk_id)
+
+def get_data_frame_data(payload):
+    return payload[1:32]
+
 
 def check_hello_frame(payload):
     return check_frame_type(payload, utils.HELLO_TYPE)
@@ -177,6 +167,10 @@ def check_chunk_info_frame(payload, expected_id):
     return ret_val & payload[3] == expected_id
 
 
+def check_data_frame(payload, expected_id):
+    return check_frame_type(payload, utils.DATA_TYPE)
+
+
 def check_frame_type(payload, type):
     if payload[0] != type:
         print("Frame received is not correct type: expected=" + str(type) + ", received=" + str(payload[0]))
@@ -184,11 +178,14 @@ def check_frame_type(payload, type):
     return True
 
 def clean_working_dir(filename):
+    filename = os.path.join(utils.WORKING_DIR, "received.txt")
+    print("File to be received: " + filename)
     try:
         os.remove(filename)
     except:
         # Directory already clean
         return
+    return filename
 
 
 def write_chunk_to_file(filename, chunk):

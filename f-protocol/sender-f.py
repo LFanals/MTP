@@ -39,16 +39,10 @@ def start_sender(chunk_size):
     for chunk_id in range(len(chunks)):
         subchunk_num = len(subchunks[chunk_id])
         send_chunk_info(radio, subchunk_num, chunk_id)
-        break
+        
         # Receiver is ready to receive the data frames
         for subchunk in subchunks[chunk_id]:
-            ready = False
-            while not ready:
-                if not send_subchunk(nrf, subchunk):
-                    print("Positive ack not received to data frame, sending again...")
-                    time.sleep(constants.RETRY_DELAY)
-                else:
-                    ready = True
+            send_subchunk(radio, subchunk)
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))
@@ -96,7 +90,7 @@ def send_hello(radio: RF24, chunk_num: int) -> bool:
 
     payload = packet_creator.create_hello_frame(chunk_num)
     print("Sending Hello frame -> num of chunks: " + str(chunk_num))
-    send_infinity(radio, payload, True) # We want to retry until we receive a positive ack
+    send_infinity(radio, payload, True)
 
 
 def send_chunk_info(radio: RF24, subchunk_num, chunk_id):
@@ -107,38 +101,9 @@ def send_chunk_info(radio: RF24, subchunk_num, chunk_id):
     print("Sending chunk info frame -> chunk id: " + str(chunk_id) + ", num of subchunks: " + str(subchunk_num))
     send_infinity(radio, payload, True)
 
-def send_subchunk(nrf: RF24, subchunk):
-    # Sends a subchunk data frame, waits for the ack
-    # If everything is successful returns true
+def send_subchunk(radio: RF24, subchunk):
 
-    # print("Sending data frame")
-    
-    attempt = 1
-    while attempt:
-        if not send(nrf, subchunk):
-            # TODO: Handle case when timeout is exceeded
-            print("  * Timeout sending data frame. Retrying transmission. Attempt: " + str(attempt))
-            attempt += 1
-
-        # Get ACK
-        # if is_package_lost(nrf):
-        #     # TODO: Handle package is lost
-        #     print("  * Data frame lost. Retrying transmission. Attempt: " + str(attempt))
-        #     attempt += 1
-
-        # Check if ACK is positive
-        (ack_received, ack_payload) = get_ack_payload(nrf)
-
-        if not ack_received:
-            print("  * ACK for data frame not received. Retrying transmission. Attempt: " + str(attempt))
-            time.sleep(constants.RETRY_DELAY)
-            attempt += 1
-        
-        else: 
-            attempt = 0
-
-    return is_ack_positive(ack_payload)
-
+    send_infinity(radio, subchunk, True)
 
 def get_ack_payload(nrf: RF24):
     # Check if an acknowledgement package is available.
