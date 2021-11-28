@@ -5,12 +5,9 @@ from datetime import datetime
 import os
 import sys
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
-
 # Local files imports
-from ..common import chunk_handler
-from ..common import utils
+import chunk_handler
+import utils
 
 # nrf24 library import
 import RF24

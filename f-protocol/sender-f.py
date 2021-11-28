@@ -1,17 +1,18 @@
-# Local files imports
-from ..common import chunk_handler
-from ..common import packet_creator
-from ..common import utils
-
-# nrf24 library import
-import RF24
-
-# General imports
+# General import
 import subprocess
 import time
 from datetime import datetime
 import os
 import sys
+
+# Local files imports
+import chunk_handler
+import packet_creator
+import utils
+
+# nrf24 library import
+import RF24
+
 
 
 def start_sender(chunk_size):
