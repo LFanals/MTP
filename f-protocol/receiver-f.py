@@ -217,7 +217,7 @@ def clean_working_dir():
 def try_decompress_chunk(chunk_data):
     try:
         decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
-        return True, decompressed_chunk
+        return False, decompressed_chunk
     except:
         return False, -1
 
