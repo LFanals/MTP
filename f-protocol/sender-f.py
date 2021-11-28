@@ -37,7 +37,7 @@ def start_sender(chunk_size):
 
     # Start sending the data frames
     chunk_id = 0
-    while chunk_id < range(len(chunks)):
+    while chunk_id < len(chunks):
         chunk_is_good = False
         subchunk_num = len(subchunks[chunk_id])
         send_chunk_info(radio, subchunk_num, chunk_id)
