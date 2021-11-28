@@ -124,6 +124,7 @@ def wait_chunk_info(radio, expected_chunk_id):
 
 
 def wait_data_frame(radio: RF24, expected_id):
+    print("Expecting subchank: "+str(expected_id))
     frame_correct = False
     while not frame_correct:
         set_next_ack(radio, True)

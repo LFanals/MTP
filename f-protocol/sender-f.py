@@ -41,8 +41,11 @@ def start_sender(chunk_size):
         send_chunk_info(radio, subchunk_num, chunk_id)
         
         # Receiver is ready to receive the data frames
+        count = 0
         for subchunk in subchunks[chunk_id]:
+            print("Sending subchunk: " + count)
             send_subchunk(radio, subchunk)
+            count = count + 1
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))
@@ -102,7 +105,6 @@ def send_chunk_info(radio: RF24, subchunk_num, chunk_id):
     send_infinity(radio, payload, True)
 
 def send_subchunk(radio: RF24, subchunk):
-
     send_infinity(radio, subchunk, True)
 
 def get_ack_payload(nrf: RF24):
