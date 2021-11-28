@@ -47,7 +47,7 @@ def start_sender(chunk_size):
         for subchunk in subchunks[chunk_id]:
             send_subchunk(radio, subchunk)
             count = count + 1
-            if count !=0 and count % 50 == 0: print("Sent until subchunk " + str(count))
+            if count !=0 and count % 50 == 0: print("Sent until subchunk " + str(count), end="\r")
 
         chunk_is_good, expected_id = send_chunk_is_good(radio, chunk_id)
         if not chunk_is_good:

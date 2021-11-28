@@ -140,7 +140,7 @@ def wait_data_frame(radio: RF24, expected_id):
 
         frame_correct = check_data_frame(payload, expected_id)
         if not frame_correct: 
-            print("Wrong data frame, waiting again", end="\r")
+            print("Wrong data frame, waiting again")
 
     return payload[1:32]
 
@@ -208,13 +208,13 @@ def get_data_frame_type_and_id(payload):
 
 def check_id(id, expected_id):
     if id != expected_id:
-        print("Wrong id: expected=" + str(expected_id) + ", received=" + str(id), end="\r")
+        print("Wrong id: expected=" + str(expected_id) + ", received=" + str(id))
         return False
     return True
 
 def check_frame_type(type, expected_type):
     if type != expected_type:
-        print("Wrong type: expected=" + str(expected_type) + ", received=" + str(type), end="\r")
+        print("Wrong type: expected=" + str(expected_type) + ", received=" + str(type))
         return False
     return True
 
