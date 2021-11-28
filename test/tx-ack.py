@@ -40,10 +40,17 @@ radio.stopListening()  # put radio in TX mode
 for i in range(10):
   n += 1
   a = time.time()
-  print(radio.write(b"HolaHolaHolaHola"))
+  if radio.write(b"HolaHolaHolaHola"):
+    print("Successful")
+    has_payload, pipe_number = radio.available_pipe()
+    if has_payload:
+      print(radio.read(2))
+    else:
+      print("Empty ACK")
+  else:
+    print("Failed")
+
   avg = (avg*(n-1) + (time.time() - a))/n
   print(avg)
-  print(radio.read(2))
-  # time.sleep(1)
 
 radio.printPrettyDetails()

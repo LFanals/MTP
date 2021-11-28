@@ -39,14 +39,15 @@ for i in range(10):
   pipe = [1]
 
   radio.writeAckPayload(1, b"xd")  # load ACK
-
-  while not radio.available():
-    # time.sleep(0.250)
+  has_data, pipe_number = radio.available_pipe()
+  # TODO: Implement timeout to wait
+  while not has_data:
+    has_data, pipe_number = radio.available_pipe()
     time.sleep(0.000001)
     
-
+  length = radio.getDynamicPayloadSize()
   recv_buffer = bytearray([])
-  recv_buffer = radio.read(16)
+  recv_buffer = radio.read(length)
   print(recv_buffer)
 
 
