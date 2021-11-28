@@ -28,8 +28,6 @@ def start_receiver():
     # Wait for Hello frame
     num_chunks = wait_hello(radio)
     
-    radio.printPrettyDetails()
-
     # At this point a positive ack has been sent
     #ioparent.control_led(1, True)
     #ioparent.control_led(3, True)
@@ -69,6 +67,8 @@ def start_receiver():
         # print(decompressed_chunk)
         write_chunk_to_file(filename, decompressed_chunk)        
 
+    radio.stopListening()
+    radio.powerDown()
     print("All data has been received correctly, copying file to usb")
     #ioparent.control_led(0, False)
     #subprocess.call("./write_usb.sh")
