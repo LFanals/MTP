@@ -54,8 +54,8 @@ def start_sender(chunk_size):
             print("Chunk was not good sending again chunk id: " + str(expected_id))
             chunk_id = expected_id
         else:
-            print("Chunk was good, going to send :" + str(chunk_id))
             chunk_id = chunk_id + 1
+            print("Chunk was good, sending next: " + str(chunk_id))
 
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
