@@ -177,22 +177,22 @@ def get_data_frame_data(payload):
 
 
 def check_hello_frame(payload):
-    return check_frame_type(payload, utils.HELLO_TYPE)
+    return check_frame_type(payload[0], utils.HELLO_TYPE)
 
 
 def check_chunk_info_frame(payload, expected_id):
-    good_type = check_frame_type(payload, utils.CHUNK_INFO_TYPE)
+    good_type = check_frame_type(payload[0], utils.CHUNK_INFO_TYPE)
     return good_type and check_id(payload[3], expected_id)
 
 
 def check_data_frame(payload, expected_id):
     (type, id) = get_data_frame_type_and_id(payload)
-    good_type = type == utils.DATA_TYPE
+    good_type = check_frame_type(type, utils.DATA_TYPE)
     return good_type and check_id(id, expected_id)
 
 
 def check_chunk_is_good_frame(payload, expected_id):
-    good_type = check_frame_type(payload, utils.CHUNK_IS_GOOD_TYPE)
+    good_type = check_frame_type(payload[0], utils.CHUNK_IS_GOOD_TYPE)
     chunk_id = int.from_bytes([payload[1], payload[2]], "little")
     return good_type and check_id(chunk_id, expected_id)
 
@@ -210,9 +210,9 @@ def check_id(id, expected_id):
         return False
     return True
 
-def check_frame_type(payload, type):
-    if payload[0] != type:
-        print("Wrong type: expected=" + str(type) + ", received=" + str(payload[0]))
+def check_frame_type(type, expected_type):
+    if type != expected_type:
+        print("Wrong type: expected=" + str(expected_type) + ", received=" + str(type))
         return False
     return True
 
