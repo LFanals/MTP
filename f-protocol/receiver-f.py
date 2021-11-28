@@ -132,6 +132,7 @@ def wait_data_frame(radio: RF24, expected_id):
         payload = wait_data(radio)
 
         frame_correct = check_data_frame(payload, expected_id)
+        print("frame incorrect, waiting again")
 
 
     return payload[1:32]
