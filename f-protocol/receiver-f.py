@@ -29,36 +29,25 @@ def start_receiver():
     num_chunks = wait_hello(radio)
     
     radio.printPrettyDetails()
-    return
+
     # At this point a positive ack has been sent
-    ioparent.control_led(1, True)
-    ioparent.control_led(3, True)
+    #ioparent.control_led(1, True)
+    #ioparent.control_led(3, True)
 
     for i in range(num_chunks):
         
         # LEDs 3, 4 and 5 will indicate the received percentage
-        if i > 2*num_chunks/3: 
-            ioparent.control_led(4, True)
-        elif i >= num_chunks - 1:
-            ioparent.control_led(5, True)
+        #if i > 2*num_chunks/3: 
+        #    ioparent.control_led(4, True)
+        #elif i >= num_chunks - 1:
+        #    ioparent.control_led(5, True)
 
 
         chunk_data = bytearray()
         # Wait for chunk_info
-        is_chunk_info = False
-        while not is_chunk_info:
-            (is_chunk_info, num_subchunks, chunk_id) = wait_chunk_info(nrf)
-            if not is_chunk_info:
-                # TODO: handle case when second packet received is not a chunk info frame
-                print("Packet received is not a chunk info packet. Waiting again for chunk info packet...")
-                
+        wait_chunk_info(radio, i)
         
-        # Check that the chunk that is going to be received corresponds to the chunk expected 
-        if i != chunk_id:
-            print("Chunk doesn't correspond to the expected chunk: expected = " + str(i) + ", received = " + str(chunk_id))
-            # TODO: handle case when chunk received doesn't correspond to the expected one
-            sys.exit()
-
+        return
         for subchunk_id in range(num_subchunks):
             (is_data_frame, data) = wait_data_frame(nrf)
             if not is_data_frame:
@@ -81,8 +70,8 @@ def start_receiver():
         write_chunk_to_file(filename, decompressed_chunk)        
 
     print("All data has been received correctly, copying file to usb")
-    ioparent.control_led(0, False)
-    subprocess.call("./write_usb.sh")
+    #ioparent.control_led(0, False)
+    #subprocess.call("./write_usb.sh")
 
 
 def setup_receiver():
@@ -115,36 +104,27 @@ def wait_hello(radio):
         set_next_ack(radio, True)
         payload = wait_data(radio)
     
-        frame_correct = check_frame_type(payload, utils.HELLO_TYPE)
+        frame_correct = check_hello_frame(payload)
 
     num_chunks = int.from_bytes([payload[1], payload[2]], "little")
     print("Hello frame received -> num of chunks: " + str(num_chunks))
     return num_chunks
 
 
-def wait_chunk_info(nrf: RF24): 
+def wait_chunk_info(radio, expected_chunk_id): 
 
     # Set a positive payload for the next ack
-    set_next_ack(nrf, True)
-    wait_data(nrf)
+    frame_correct = False
+    while not frame_correct:
+        set_next_ack(radio, True)
+        payload = wait_data(radio)
 
-    # Data is available, check it is chunk_info frame
-    payload = nrf.get_payload()
-    if payload[0] != 0x01:
-        print("Frame received is not a chunk info frame: payload[0] = " + str(payload[0]))
-        return (False, -1, -1)
+        frame_correct = check_chunk_info_frame(payload, expected_chunk_id)
 
-    # Get subchunks ammount (bytes at position 1 and 2)
-    #subchunks_num = int.from_bytes(payload[1].to_bytes(1, 'big') + payload[2].to_bytes(1, 'big'), 'big')
-    #chunk_id = payload[3]
-
-    # Temporal workaround while create_chunk_info_frame() is not working properly
-    subchunks_num = int.from_bytes([payload[1], payload[2]], "little")
-    chunk_id = payload[3] 
-
+    (subchunks_num, chunk_id) = get_chunk_info_data(payload)
     print("Chunk_info received -> Chunk id: " + str(chunk_id) + ", num of subchunks: " + str(subchunks_num))
     
-    return (True, subchunks_num, chunk_id)
+    return (True, subchunks_num)
 
 
 def wait_data_frame(nrf: RF24):
@@ -183,13 +163,25 @@ def wait_data(radio: RF24):
     length = radio.getDynamicPayloadSize()
     return radio.read(length)
 
+def get_chunk_info_data(payload):
+    subchunks_num = int.from_bytes([payload[1], payload[2]], "little")
+    chunk_id = payload[3] 
+    return (subchunks_num, chunk_id)
+
+def check_hello_frame(payload):
+    return check_frame_type(payload, utils.HELLO_TYPE)
+
+
+def check_chunk_info_frame(payload, expected_id):
+    ret_val = check_frame_type(payload, utils.CHUNK_INFO_TYPE)
+    return ret_val & payload[3] == expected_id
+
 
 def check_frame_type(payload, type):
     if payload[0] != type:
         print("Frame received is not correct type: expected=" + str(type) + ", received=" + str(payload[0]))
         return False
     return True
-
 
 def clean_working_dir(filename):
     try:

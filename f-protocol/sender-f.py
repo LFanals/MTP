@@ -34,21 +34,12 @@ def start_sender(chunk_size):
 
     # Send Hello frame
     send_hello(radio, len(chunks))
+
     # Start sending the data frames
-    # For each chunk we send a chunk_info frame with the number of subchunks and the chunk id
-    # To start sending the subchunks we must receive a positive ack to the chunk_info frame
-    return
     for chunk_id in range(len(chunks)):
         subchunk_num = len(subchunks[chunk_id])
-        ready = False
-        while not ready:
-            if not send_chunk_info(nrf, subchunk_num, chunk_id):
-                # TODO: delete this while
-                # Receiver is not ready yet or the ack has been lost. Wait and try again
-                print("Positive ack not received to chunk_info frame, sending again...")
-                time.sleep(constants.RETRY_DELAY)
-            else:
-                ready = True
+        send_chunk_info(radio, subchunk_num, chunk_id)
+        return
         # Receiver is ready to receive the data frames
         for subchunk in subchunks[chunk_id]:
             ready = False
@@ -103,75 +94,18 @@ def send_hello(radio: RF24, chunk_num: int) -> bool:
     # Sends the hello frame, waits for the ack and checks that it is positive
     # If everything is successful returns true
 
-    # Create and send hello frame
     payload = packet_creator.create_hello_frame(chunk_num)
+    print("Sending Hello frame -> num of chunks: " + str(chunk_num))
     send_infinity(radio, payload, True) # We want to retry until we receive a positive ack
 
-def send_infinity(radio, payload, check_ack_is_positive):
-    attempt = 1
 
-    success, ack_payload = send(radio, payload)
-    is_positive = True
-
-    if check_ack_is_positive:
-        is_positive = is_ack_positive(ack_payload)    
-
-    while not success or not is_positive: 
-        print("Retrying. Attempt: " + str(attempt))
-        success, ack_payload = send(radio, payload)
-        attempt = attempt + 1
-        time.sleep(utils.RETRY_DELAY)
-    return ack_payload
-
-def send(radio, payload):
-    
-    if radio.write(payload): # Sends and waits ack (2 layer OSI retries included)
-        print("Success")
-        has_payload, pipe_number = radio.available_pipe()
-        if has_payload:
-            print("Has payload")
-            length = radio.getDynamicPayloadSize()
-            return (True, radio.read(length))
-        else:
-            print("Empty ACK")
-            return (False, -1)
-    else:
-        print("Failed")
-        return (False, -1)
-
-def send_chunk_info(nrf: RF24, subchunk_num, chunk_id):
+def send_chunk_info(radio: RF24, subchunk_num, chunk_id):
     # Sends the chunk info frame, waits for the ack and checks that is it positive
     # If everything is successful returns true
 
-    # Create and send chunk_info frame
     payload = packet_creator.create_chunk_info_frame(subchunk_num, chunk_id)
     print("Sending chunk info frame -> chunk id: " + str(chunk_id) + ", num of subchunks: " + str(subchunk_num))
-
-    attempt = 1
-    while attempt:
-        if not send(nrf, payload):
-            # TODO: Handle case when timeout is exceeded
-            print("  * Timeout sending chunk info frame. Retrying transmission. Attempt: " + str(attempt))
-            attempt += 1
-
-        # Get ACK
-        # if is_package_lost(nrf):
-        #     # TODO: Handle package is lost
-        #     print("  * Chunk info frame lost. Retrying transmission. Attempt: " + str(attempt))
-        #     attempt += 1
-
-        # Check if ACK is positive
-        (ack_received, ack_payload) = get_ack_payload(nrf)
-
-        if not ack_received:
-            print("  * ACK for chunk info frame not received. Retrying transmission. Attempt: " + str(attempt))
-            time.sleep(utils.RETRY_DELAY)
-            attempt += 1
-        
-        else: 
-            attempt = 0
-
-    return is_ack_positive(ack_payload)
+    send_infinity(radio, payload, True)
 
 def send_subchunk(nrf: RF24, subchunk):
     # Sends a subchunk data frame, waits for the ack
@@ -235,6 +169,39 @@ def is_ack_positive(ack_payload):
     except:
         return False
     return False
+
+
+def send_infinity(radio, payload, check_ack_is_positive):
+    attempt = 1
+
+    success, ack_payload = send(radio, payload)
+    is_positive = True
+
+    if check_ack_is_positive:
+        is_positive = is_ack_positive(ack_payload)    
+
+    while not success or not is_positive: 
+        print("Retrying. Attempt: " + str(attempt))
+        success, ack_payload = send(radio, payload)
+        attempt = attempt + 1
+        time.sleep(utils.RETRY_DELAY)
+    return ack_payload
+
+
+def send(radio, payload):
+    
+    if radio.write(payload): # Sends and waits ack (2 layer OSI retries included)
+        print("Success")
+        has_payload, pipe_number = radio.available_pipe()
+        if has_payload:
+            length = radio.getDynamicPayloadSize()
+            return (True, radio.read(length))
+        else:
+            print("Empty ACK")
+            return (False, -1)
+    else:
+        print("Failed")
+        return (False, -1)
 
 
 if __name__ == "__main__":
