@@ -111,7 +111,7 @@ def wait_chunk_info(radio, expected_chunk_id):
     count = 0
     while not frame_correct:
         if count != 0: 
-            set_next_ack(radio, False, expected_chunk_id)
+            set_next_ack(radio, False, expected_chunk_id) # This will make sender align with us
         else:
             set_next_ack(radio, True, expected_chunk_id)
         payload = wait_data(radio)
@@ -120,10 +120,6 @@ def wait_chunk_info(radio, expected_chunk_id):
         if not frame_correct:
             print("Wrong chunk_info, waiting again")
         count = count + 1
-        if frame_correct and count > 1:
-            print("Frame info was correct but expect another one")
-            frame_correct = False
-            count = 0
     (num_subchunks, chunk_id) = get_chunk_info_data(payload)
     print("Chunk_info received -> Chunk id: " + str(chunk_id) + ", num of subchunks: " + str(num_subchunks))
 
@@ -234,7 +230,7 @@ def clean_working_dir():
 def try_decompress_chunk(chunk_data):
     try:
         decompressed_chunk = chunk_handler.decompress_chunk(chunk_data)
-        print("Decompression succeed!!")
+        print("\nDecompression succeed!!")
         return True, decompressed_chunk
     except:
         print("Decompression failed!!")
