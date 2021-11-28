@@ -156,11 +156,6 @@ def wait_chunk_is_good_frame(radio: RF24, chunk_is_good, expected_chunk_id):
     print("Chunk is good received -> Chunk id: " + str(expected_chunk_id))
     
 
-def set_next_ack(radio: RF24, positive, chunk_id = -1):
-    positive_b = 1 if positive else 0 
-    radio.writeAckPayload(1, bytearray([positive_b, chunk_id]))
-
-
 def wait_data(radio: RF24):
     has_data, pipe_number = radio.available_pipe()
     # TODO: Implement timeout to wait
@@ -220,6 +215,11 @@ def check_frame_type(payload, type):
         print("Wrong type: expected=" + str(type) + ", received=" + str(payload[0]))
         return False
     return True
+
+def set_next_ack(radio: RF24, positive, chunk_id = 0):
+    positive_b = 1 if positive else 0 
+    radio.writeAckPayload(1, bytearray([positive_b, chunk_id]))
+
 
 def clean_working_dir():
     try:
