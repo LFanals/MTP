@@ -1,6 +1,6 @@
 import RF24
 # Protocol configuration
-CHUNKS_SIZE = 250
+CHUNKS_SIZE = 100
 SLEEP_DELAY = 0.0001
 COMPRESSION_LEVEL = 7
 
