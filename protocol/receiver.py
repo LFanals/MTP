@@ -28,10 +28,7 @@ def start_receiver():
     # Wait for Hello frame
     num_chunks = wait_hello(radio)
     
-    # At this point a positive ack has been sent
-    #ioparent.control_led(1, True)
-    #ioparent.control_led(3, True)
-    ioparent.control_led(1, True)
+    blink_led = True
     for i in range(num_chunks):
         chunk_is_good = False
         print("\n________________________________")
@@ -45,8 +42,10 @@ def start_receiver():
             for subchunk_id in range(num_subchunks):
                 data = wait_data_frame(radio, subchunk_id)
                 
-                # if subchunk_id != 0 and subchunk_id % 50 == 0:
-                #     print("  + Received until subchunk " + str(subchunk_id))
+                if subchunk_id != 0 and subchunk_id % 200 == 0:
+                    print("  + Received until subchunk " + str(subchunk_id))
+                    ioparent.control_led(1, blink_led)
+                    blink_led = not blink_led
 
                 chunk_data.extend(data)
             

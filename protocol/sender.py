@@ -40,8 +40,8 @@ def start_sender():
 
     # Start sending the data frames
     chunk_id = 0
-    
-    ioparent.control_led(1, True)
+    blink_led = True
+
     while chunk_id < num_chunks:
         ioparent.update_led_percentage(chunk_id, num_chunks)
         chunk_is_good = False
@@ -55,13 +55,17 @@ def start_sender():
         for subchunk in subchunks[chunk_id]:
             send_subchunk(radio, subchunk)
             count = count + 1
-            # if count !=0 and count % 50 == 0: print("  + Sent until subchunk " + str(count))
+            if count !=0 and count % 200 == 0: 
+                print("  + Sent until subchunk " + str(count))
+                ioparent.control_led(1, blink_led)
+                blink_led = not blink_led
+
 
         chunk_is_good, expected_id = send_chunk_is_good(radio, chunk_id)
         if not chunk_is_good:
             print("Chunk was not good sending again chunk id: " + str(expected_id))
             chunk_id = expected_id
-        elif chunk_id != num_chunks:
+        elif chunk_id + 1 != num_chunks:
             chunk_id = chunk_id + 1
             print("Chunk was good, sending next.")
 
