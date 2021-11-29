@@ -20,9 +20,9 @@ def main():
     is_TX = SW[1]
     is_NM = SW[2]
     mode = SW[3]
-    status = 0
+    status = 1
 
-    while status == 0:
+    while status != 0:
         if is_NM: 
             print("SW[2] == 1 --> Mode: NM")
             #TODO: link with NM logic
