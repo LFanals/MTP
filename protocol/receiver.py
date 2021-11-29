@@ -38,8 +38,8 @@ def start_receiver(mode):
         print("\n________________________________")
         print("Receiving chunk ", chunk_id)
         while not chunk_is_good:
-            ioparent.update_led_percentage(i, num_chunks)
-            chunk_data = bytearray()
+            ioparent.update_led_percentage(chunk_id, num_chunks)
+            chunk_data = bytearray() 
             # Wait for chunk_info
             num_subchunks = wait_chunk_info(radio, chunk_id)
             
