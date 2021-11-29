@@ -45,8 +45,9 @@ def start_receiver():
             for subchunk_id in range(num_subchunks):
                 data = wait_data_frame(radio, subchunk_id)
                 
-                if subchunk_id != 0 and subchunk_id % 50 == 0:
-                    print("  + Received until subchunk " + str(subchunk_id))
+                # if subchunk_id != 0 and subchunk_id % 50 == 0:
+                #     print("  + Received until subchunk " + str(subchunk_id))
+
                 chunk_data.extend(data)
             
             chunk_is_good, decompressed_chunk = try_decompress_chunk(chunk_data)
