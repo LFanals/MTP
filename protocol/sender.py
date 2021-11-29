@@ -9,13 +9,15 @@ import sys
 import chunk_handler
 import packet_creator
 import utils
+import ioparent
 
 # nrf24 library import
 import RF24
 
 
 
-def start_sender(chunk_size):
+
+def start_sender():
     print("Starting sender")
     time_start = time.time()
 
@@ -38,6 +40,7 @@ def start_sender(chunk_size):
     # Start sending the data frames
     chunk_id = 0
     while chunk_id < len(chunks):
+        ioparent.update_led_percentage()
         chunk_is_good = False
         subchunk_num = len(subchunks[chunk_id])
         send_chunk_info(radio, subchunk_num, chunk_id)
@@ -60,6 +63,8 @@ def start_sender(chunk_size):
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))
+
+
 
 def get_file_from_working_dir() -> str:
 

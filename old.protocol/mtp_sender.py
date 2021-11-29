@@ -18,18 +18,9 @@ import ioparent
 
 def start_sender(chunk_size):
     print("Starting sender")
-    
+    ioparent.control_led(1, True)
     time_start = time.time()
 
-<<<<<<< Updated upstream
-=======
-    global config
-    if mode: 
-        import MRMconfig as config
-    else:
-        import SRconfig as config
-    
->>>>>>> Stashed changes
     # Setup nrf24 sender
     nrf = setup_sender()
 
@@ -56,12 +47,6 @@ def start_sender(chunk_size):
     # For each chunk we send a chunk_info frame with the number of subchunks and the chunk id
     # To start sending the subchunks we must receive a positive ack to the chunk_info frame
     for chunk_id in range(len(chunks)):
-        if chunk_id > 2*len(chunks)/3: 
-            ioparent.control_led(4, True)
-        elif chunk_id >= len(chunks) - 1:
-            ioparent.control_led(4, True)
-            ioparent.control_led(5, True) 
-            
         subchunk_num = len(subchunks[chunk_id])
         ready = False
         while not ready:
@@ -81,7 +66,6 @@ def start_sender(chunk_size):
                     time.sleep(constants.RETRY_DELAY)
                 else:
                     ready = True
-        
     print("Reached end of program. In theory all data has been sent correctly")
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))

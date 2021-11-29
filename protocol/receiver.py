@@ -8,6 +8,7 @@ import sys
 # Local files imports
 import chunk_handler
 import utils
+import ioparent
 
 # nrf24 library import
 import RF24
@@ -34,12 +35,7 @@ def start_receiver():
     for i in range(num_chunks):
         chunk_is_good = False
         while not chunk_is_good:
-            # LEDs 3, 4 and 5 will indicate the received percentage
-            #if i > 2*num_chunks/3: 
-            #    ioparent.control_led(4, True)
-            #elif i >= num_chunks - 1:
-            #    ioparent.control_led(5, True)
-
+            ioparent.update_led_percentage(i, num_chunks)
             chunk_data = bytearray()
             # Wait for chunk_info
             num_subchunks = wait_chunk_info(radio, i)

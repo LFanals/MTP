@@ -5,7 +5,8 @@ import sys
 
 HELLO_PREFIX = 0
 CHUNK_INFO_PREFIX = 1
-DATA_PREFIX = b'\x02'
+DATA_PREFIX = 2
+CHUNK_IS_GOOD_PREFIX = 3
 SUBCHUNK_SIZE = 31
 PAYLOAD_SIZE = 32
 
@@ -23,7 +24,6 @@ def zero_padd_list(list, N):
     return list
 
 def create_hello_frame(chunk_amount):
-    print("Creating Hello Frame")
     
     b_chunk_amount = chunk_amount.to_bytes(2, 'little')
     frame = [HELLO_PREFIX, b_chunk_amount[0], b_chunk_amount[1]]
@@ -33,7 +33,6 @@ def create_hello_frame(chunk_amount):
 
 
 def create_chunk_info_frame(subchunk_amount, chunk_id):
-    print("Creating Chunk Info Frame")
     # TODO: Re-implement this function to ensure two bytes for amount
     # It will break if subchunk amount is bigger than 255
     b_subchunk_amount = subchunk_amount.to_bytes(2, 'little')
@@ -49,7 +48,6 @@ def divide_in_subchunks(l, n):
     
 
 def create_data_frames(chunk_list):
-    print("Creating List of Data Frames")
     
     rts_chunk_list = []
 
@@ -59,7 +57,7 @@ def create_data_frames(chunk_list):
         rts_subchunk_list = []
         for i in range(len(subchunk_list)):
             # Insert "type" prefix at position 0
-            subchunk = bytearray(DATA_PREFIX) + subchunk_list[i]
+            subchunk = data_type_and_id_to_byte(i) + subchunk_list[i]
 
             # 0 padding if necessary
             subchunk = zero_padd_list(subchunk, SUBCHUNK_SIZE)
@@ -73,6 +71,16 @@ def create_data_frames(chunk_list):
     return rts_chunk_list
 
 
+def create_chunk_is_good_frame(chunk_id):
+    b_chunk_id = chunk_id.to_bytes(2, 'little')
+    frame = [CHUNK_IS_GOOD_PREFIX, b_chunk_id[0], b_chunk_id[1]]
+    frame = zero_padd_list(frame, SUBCHUNK_SIZE)
+    frame = bytearray(frame)
+    return frame
+
+def data_type_and_id_to_byte(id):
+    id = id % 15 # Data id will be module 15 to fit in the 4 right bits
+    return bytearray([DATA_PREFIX << 4 | id ])
 
 def main():
     chunk_amount = 100
