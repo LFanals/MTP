@@ -6,23 +6,25 @@ from time import sleep
 import os
 
 def main():
-    
+    # os.system("sudo killall pigpiod")
     os.system("sudo pigpiod")
     # Get transmitter or receiver arguments
     ioparent.config()
-    ioparent.reset_leds()
 
-    while not ioparent.is_master_on():
-        sleep(0.1)  
-
-    SW = ioparent.read_switches() # get switches config, decide which son to run, add logic below
-    print("Master switch set to 1. Reading configuration")
-    is_TX = SW[1]
-    is_NM = SW[2]
-    mode = SW[3]
     status = 1
-
     while status != 0:
+        # os.system("sudo killall pigpiod")
+        # os.system("sudo pigpiod")
+        ioparent.reset_leds()
+        while not ioparent.is_master_on():
+            sleep(0.1)  
+
+        SW = ioparent.read_switches() # get switches config, decide which son to run, add logic below
+        print("Master switch set to 1. Reading configuration")
+        is_TX = SW[1]
+        is_NM = SW[2]
+        mode = SW[3]
+
         if is_NM: 
             print("SW[2] == 1 --> Mode: NM")
             #TODO: link with NM logic
@@ -41,6 +43,7 @@ def main():
         if status: print("\nMANUAL INTERRUPT")
         else: print("\nFINISHED CORRECTLY")
         sleep(0.1)
+        
     
         
 
