@@ -29,7 +29,7 @@ def start_sender(mode):
     filename = get_file_from_working_dir()
 
     # Get file chunks
-    chunks = chunk_handler.get_file_chunks(filename, config.CHUNKS_SIZE)
+    chunks = chunk_handler.get_file_chunks(filename, config.CHUNKS_SIZEm, config.COMPRESSION_LEVEL)
     subchunks = packet_creator.create_data_frames(chunks)
 
     # Send Hello frame
