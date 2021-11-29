@@ -29,15 +29,19 @@ def start_receiver(mode):
     num_chunks = wait_hello(radio)
     
     blink_led = True
-    for i in range(num_chunks):
+    for chunk_id in range(num_chunks):
+        # check if master switch is still ON
+        if not ioparent.is_master_on():
+            return 1
+
         chunk_is_good = False
         print("\n________________________________")
-        print("Receiving chunk ", i)
+        print("Receiving chunk ", chunk_id)
         while not chunk_is_good:
             ioparent.update_led_percentage(i, num_chunks)
             chunk_data = bytearray()
             # Wait for chunk_info
-            num_subchunks = wait_chunk_info(radio, i)
+            num_subchunks = wait_chunk_info(radio, chunk_id)
             
             for subchunk_id in range(num_subchunks):
                 data = wait_data_frame(radio, subchunk_id)
@@ -50,9 +54,9 @@ def start_receiver(mode):
                 chunk_data.extend(data)
             
             chunk_is_good, decompressed_chunk = try_decompress_chunk(chunk_data)
-            wait_chunk_is_good_frame(radio, chunk_is_good, i)
+            wait_chunk_is_good_frame(radio, chunk_is_good, chunk_id)
             if not chunk_is_good:
-                print("Chunk was not good expecting to receive again chunk id: " + str(i))
+                print("Chunk was not good expecting to receive again chunk id: " + str(chunk_id))
             
         write_chunk_to_file(filename, decompressed_chunk)        
 
@@ -60,8 +64,7 @@ def start_receiver(mode):
     radio.powerDown()
     print("All data has been received correctly, copying file to usb")
     ioparent.control_led(1, False)
-    #ioparent.control_led(0, False)
-    #subprocess.call("./write_usb.sh")
+    return 0
 
 
 def setup_receiver():

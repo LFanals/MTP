@@ -41,6 +41,10 @@ def start_sender(mode):
     blink_led = True
 
     while chunk_id < num_chunks:
+        # check if master switch is still ON
+        if not ioparent.is_master_on():
+            return 1
+
         ioparent.update_led_percentage(chunk_id, num_chunks)
         chunk_is_good = False
         subchunk_num = len(subchunks[chunk_id])
@@ -71,6 +75,7 @@ def start_sender(mode):
     ioparent.control_led(1, False)
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))
+    return 0
 
 
 
