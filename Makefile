@@ -6,7 +6,7 @@ run:
 	
 push:
 	git add .
-	git commit -m "tweak"
+	git commit -m "test"
 	git push
 
 pull:

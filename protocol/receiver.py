@@ -90,7 +90,15 @@ def wait_hello(radio):
     frame_correct = False
     while not frame_correct:
         set_next_ack(radio, True)
-        payload = wait_data(radio)
+        has_data, pipe_number = radio.available_pipe()
+        # TODO: Implement timeout to wait
+        while not has_data:
+            has_data, pipe_number = radio.available_pipe()
+            time.sleep(0.1)
+
+        length = radio.getDynamicPayloadSize()
+
+        payload = radio.read(length)
     
         frame_correct = check_hello_frame(payload)
         if not frame_correct:
