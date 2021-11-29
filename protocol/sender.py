@@ -14,12 +14,10 @@ import ioparent
 # nrf24 library import
 import RF24
 
-
-
-
-def start_sender():
+def start_sender(mode):
     print("Starting sender")
     time_start = time.time()
+    set_global_config(mode)
 
     # Setup nrf24 sender
     radio = setup_sender()
@@ -31,7 +29,7 @@ def start_sender():
     filename = get_file_from_working_dir()
 
     # Get file chunks
-    chunks = chunk_handler.get_file_chunks(filename, utils.CHUNKS_SIZE)
+    chunks = chunk_handler.get_file_chunks(filename, config.CHUNKS_SIZE)
     subchunks = packet_creator.create_data_frames(chunks)
 
     # Send Hello frame
@@ -94,12 +92,12 @@ def setup_sender():
 
     print("Setting up the NRF24 configuration")
 
-    radio = RF24.RF24(utils.SPI_SPEED)
+    radio = RF24.RF24(config.SPI_SPEED)
     radio.begin(utils.CE_PIN, utils.IRQ_PIN) #Set CE and IRQ pins
-    radio.setPALevel(utils.PA_LEVEL)
-    radio.setDataRate(utils.DATA_RATE)
-    radio.setChannel(utils.CHANNEL)
-    radio.setRetries(utils.RETRY_DELAY,utils.RETRY_COUNT)
+    radio.setPALevel(config.PA_LEVEL)
+    radio.setDataRate(config.DATA_RATE)
+    radio.setChannel(config.CHANNEL)
+    radio.setRetries(config.RETRY_DELAY,config.RETRY_COUNT)
 
     radio.enableDynamicPayloads()  
     radio.enableAckPayload()
@@ -167,7 +165,7 @@ def send_infinity(radio, payload, check_ack_is_positive):
         if check_ack_is_positive:
             is_positive = is_ack_positive(ack_payload)    
         attempt = attempt + 1
-        time.sleep(utils.SLEEP_DELAY)
+        time.sleep(config.SLEEP_DELAY)
     return ack_payload
 
 
@@ -182,8 +180,16 @@ def send(radio, payload):
             print("Empty ACK")
             return (False, -1)
     else:
-        print("Failed")
+        # print("Failed")
         return (False, -1)
+
+
+def set_global_config(mode):
+    global config
+    if mode: 
+        import configMRM as config
+    else:
+        import configSR as config
 
 
 if __name__ == "__main__":

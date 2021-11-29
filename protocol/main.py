@@ -26,17 +26,15 @@ def main():
         #TODO: link with NM logic
     else:
         print("SW[2] == 0 --> Mode: MRM or SR")
-        if mode:
-            print("SW[3] == 1 --> Mode: MRM")
-        else:
-            print("SW[3] == 0 --> Mode: SR")
+        if mode: print("SW[3] == 1 --> Mode: MRM")
+        else: print("SW[3] == 0 --> Mode: SR")
 
         if is_TX:
             print("SW[1] == 1 --> Starting communcation as: SENDER")
-            start_sender()
+            start_sender(mode)
         else:
             print("SW[1] == 0 --> Starting communcation as: RECEIVER")
-            start_receiver()
+            start_receiver(mode)
 
 if __name__ == "__main__":
     main()

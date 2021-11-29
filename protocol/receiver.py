@@ -16,9 +16,9 @@ import RF24
 
 filename = os.path.join(utils.WORKING_DIR, "received.txt")
 
-def start_receiver():
+def start_receiver(mode):
     print("Starting receiver")
-
+    set_global_config(mode)
     # Setup nrf24
     radio = setup_receiver()
 
@@ -67,12 +67,12 @@ def start_receiver():
 def setup_receiver():
     print("Setting up the NRF24 configuration")
 
-    radio = RF24.RF24(utils.SPI_SPEED)
+    radio = RF24.RF24(config.SPI_SPEED)
     radio.begin(utils.CE_PIN, utils.IRQ_PIN) #Set CE and IRQ pins
-    radio.setPALevel(utils.PA_LEVEL)
-    radio.setDataRate(utils.DATA_RATE)
-    radio.setChannel(utils.CHANNEL)
-    radio.setRetries(utils.RETRY_DELAY,utils.RETRY_COUNT)
+    radio.setPALevel(config.PA_LEVEL)
+    radio.setDataRate(config.DATA_RATE)
+    radio.setChannel(config.CHANNEL)
+    radio.setRetries(config.RETRY_DELAY,config.RETRY_COUNT)
 
     radio.enableDynamicPayloads()  
     radio.enableAckPayload()
@@ -246,5 +246,14 @@ def write_chunk_to_file(filename, chunk):
     f.close()
 
 
+def set_global_config(mode):
+    global config
+    if mode: 
+        import configMRM as config
+    else:
+        import configSR as config
+
+
 if __name__ == "__main__":
     start_receiver()
+    
