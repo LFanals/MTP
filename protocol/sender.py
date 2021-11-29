@@ -39,8 +39,9 @@ def start_sender():
 
     # Start sending the data frames
     chunk_id = 0
+    ioparent.control_led(1, True)
     while chunk_id < len(chunks):
-        ioparent.update_led_percentage()
+        ioparent.update_led_percentage(chunk_id, len(chunks))
         chunk_is_good = False
         subchunk_num = len(subchunks[chunk_id])
         send_chunk_info(radio, subchunk_num, chunk_id)
@@ -61,6 +62,7 @@ def start_sender():
             print("Chunk was good, sending next: " + str(chunk_id))
 
     print("Reached end of program. In theory all data has been sent correctly")
+    ioparent.control_led(1, False)
     time_end = time.time()
     print("Time elapsed: " + str(time_end - time_start))
 

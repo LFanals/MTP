@@ -31,7 +31,7 @@ def start_receiver():
     # At this point a positive ack has been sent
     #ioparent.control_led(1, True)
     #ioparent.control_led(3, True)
-
+    ioparent.control_led(1, True)
     for i in range(num_chunks):
         chunk_is_good = False
         while not chunk_is_good:
@@ -57,6 +57,7 @@ def start_receiver():
     radio.stopListening()
     radio.powerDown()
     print("All data has been received correctly, copying file to usb")
+    ioparent.control_led(1, False)
     #ioparent.control_led(0, False)
     #subprocess.call("./write_usb.sh")
 
