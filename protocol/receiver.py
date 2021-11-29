@@ -34,6 +34,8 @@ def start_receiver():
     ioparent.control_led(1, True)
     for i in range(num_chunks):
         chunk_is_good = False
+        print("\n________________________________")
+        print("Receiving chunk ", i)
         while not chunk_is_good:
             ioparent.update_led_percentage(i, num_chunks)
             chunk_data = bytearray()
@@ -44,7 +46,7 @@ def start_receiver():
                 data = wait_data_frame(radio, subchunk_id)
                 
                 if subchunk_id != 0 and subchunk_id % 50 == 0:
-                    print("Received until subchunk " + str(subchunk_id), end="\r")
+                    print("  + Received until subchunk " + str(subchunk_id))
                 chunk_data.extend(data)
             
             chunk_is_good, decompressed_chunk = try_decompress_chunk(chunk_data)
@@ -90,15 +92,7 @@ def wait_hello(radio):
     frame_correct = False
     while not frame_correct:
         set_next_ack(radio, True)
-        has_data, pipe_number = radio.available_pipe()
-        # TODO: Implement timeout to wait
-        while not has_data:
-            has_data, pipe_number = radio.available_pipe()
-            time.sleep(0.1)
-
-        length = radio.getDynamicPayloadSize()
-
-        payload = radio.read(length)
+        payload = wait_data(radio)
     
         frame_correct = check_hello_frame(payload)
         if not frame_correct:

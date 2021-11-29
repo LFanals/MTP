@@ -35,31 +35,35 @@ def start_sender():
     subchunks = packet_creator.create_data_frames(chunks)
 
     # Send Hello frame
-    send_hello(radio, len(chunks))
+    num_chunks = len(chunks)
+    send_hello(radio, num_chunks)
 
     # Start sending the data frames
     chunk_id = 0
+    
     ioparent.control_led(1, True)
-    while chunk_id < len(chunks):
-        ioparent.update_led_percentage(chunk_id, len(chunks))
+    while chunk_id < num_chunks:
+        ioparent.update_led_percentage(chunk_id, num_chunks)
         chunk_is_good = False
         subchunk_num = len(subchunks[chunk_id])
         send_chunk_info(radio, subchunk_num, chunk_id)
+        print("\n________________________________")
+        print("Sending chunk ", chunk_id)
         
         # Receiver is ready to receive the data frames
         count = 0
         for subchunk in subchunks[chunk_id]:
             send_subchunk(radio, subchunk)
             count = count + 1
-            if count !=0 and count % 50 == 0: print("Sent until subchunk " + str(count), end="\r")
+            if count !=0 and count % 50 == 0: print("  + Sent until subchunk " + str(count))
 
         chunk_is_good, expected_id = send_chunk_is_good(radio, chunk_id)
         if not chunk_is_good:
             print("Chunk was not good sending again chunk id: " + str(expected_id))
             chunk_id = expected_id
-        else:
+        elif chunk_id != num_chunks:
             chunk_id = chunk_id + 1
-            print("Chunk was good, sending next: " + str(chunk_id))
+            print("Chunk was good, sending next.")
 
     print("Reached end of program. In theory all data has been sent correctly")
     ioparent.control_led(1, False)

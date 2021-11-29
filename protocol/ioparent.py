@@ -102,9 +102,7 @@ def reset_leds():
     control_led(5, False)
 
 def update_led_percentage(chunk_id, total_chunks):
+    chunk_id = chunk_id + 1
     if chunk_id > total_chunks/3: control_led(3, True)
     if chunk_id > 2*total_chunks/3: control_led(4, True)
-
-    print("chunk_id: ", chunk_id)
-    print("total_chunks: ", total_chunks)
-    if chunk_id >= total_chunks: control_led(5, True) 
+    if chunk_id == total_chunks: control_led(5, True) 
