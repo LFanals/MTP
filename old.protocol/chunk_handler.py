@@ -1,7 +1,7 @@
 from typing import List
 import math
 import zlib
-import utils
+import constants
 
 
 def get_file_chunks(filename: str, chunk_size: int) -> List[bytearray]: 
@@ -39,7 +39,7 @@ def compress_chunks(chunks: List[bytes]) -> List[bytearray]:
 
 def compress_chunk(chunk: bytes) -> bytearray:
     # Gets the chunk as bytes and compressess it
-    return bytearray(zlib.compress(chunk, level=utils.COMPRESSION_LEVEL))
+    return bytearray(zlib.compress(chunk, level=constants.COMPRESSION_LEVEL))
 
 def decompress_chunk(compressed: bytearray) -> bytes:
     return zlib.decompress(bytes(compressed))

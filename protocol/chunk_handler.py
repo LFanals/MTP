@@ -1,15 +1,15 @@
 from typing import List
 import math
 import zlib
-import constants
+import utils
 
 
-def get_file_chunks(filename: str, chunk_size: int) -> List[bytearray]: 
+def get_file_chunks(filename: str, chunk_size: int, compression_level) -> List[bytearray]: 
     # Given a filename and the size of the chunks (in kB) returns a list of the compressed chunks as bytearrays
     print("Getting file " + filename + " chunks")
     file = read_file(filename)
     chunks = divide_file(file, chunk_size)
-    return compress_chunks(chunks)
+    return compress_chunks(chunks, compression_level)
 
 
 def read_file(filename: str) -> bytes:
@@ -29,17 +29,17 @@ def divide_file(file: bytes, size: int) -> List[bytes]:
         pointer = (i+1) * size
     return chunks
 
-def compress_chunks(chunks: List[bytes]) -> List[bytearray]:
+def compress_chunks(chunks: List[bytes], compression_level) -> List[bytearray]:
     # Gets all the chunks as strings in a list and compressess each of them.
     compressed_chunks = list()
     for chunk in chunks:
-        compressed_chunks.append(compress_chunk(chunk))
+        compressed_chunks.append(compress_chunk(chunk, compression_level))
     return compressed_chunks
 
 
-def compress_chunk(chunk: bytes) -> bytearray:
+def compress_chunk(chunk: bytes, compression_level) -> bytearray:
     # Gets the chunk as bytes and compressess it
-    return bytearray(zlib.compress(chunk, level=constants.COMPRESSION_LEVEL))
+    return bytearray(zlib.compress(chunk, level=compression_level))
 
 def decompress_chunk(compressed: bytearray) -> bytes:
     return zlib.decompress(bytes(compressed))

@@ -52,6 +52,7 @@ def config():
      
     print("Configured IO")    
 
+
 def read_switches():
     # Reads inputs two times, with a 100ms delay between, to avoid metastability
     # Returns boolean to indicate if all switches are stable and array with values
@@ -61,17 +62,33 @@ def read_switches():
     iSW4 = GPIO.input(SW4)
     iSW5 = GPIO.input(SW5)
 
-    return [iSW1, iSW2, iSW3, iSW4, iSW5]
+    time.sleep(0.1)
+
+    iiSW1 = GPIO.input(SW1)
+    iiSW2 = GPIO.input(SW2)
+    iiSW3 = GPIO.input(SW3)
+    iiSW4 = GPIO.input(SW4)
+    iiSW5 = GPIO.input(SW5)
+
+    print("Read switches")
+
+    if (iSW1 == iiSW1 and iSW2 == iiSW2 and iSW3 == iiSW3 and iSW4 == iiSW4 and iSW5 == iiSW5):
+        return True, [iSW1, iSW2, iSW3, iSW4, iSW5] 
+    else:
+        return False, [iSW1, iSW2, iSW3, iSW4, iSW5]
 
 
 def is_master_on():
     # Returns boolean to indicate SW1 state
-    SW = read_switches()
-
-    if SW[0] == 1:
-        return True
-    else:
+    state, SW = read_switches()
+    if not(state):
         return False
+    else:
+        print("Got master switch: ", str(SW[0]))
+        if SW[0] == 1:
+            return True
+        else:
+            return False
             
 
 def control_led(led: int, state: bool):
@@ -94,15 +111,16 @@ def control_led(led: int, state: bool):
     else:
         print("Bad led number")
 
-def reset_leds():
-    control_led(1, False)
-    control_led(2, False)
-    control_led(3, False)
-    control_led(4, False)
-    control_led(5, False)
+    print("Controlled led")
 
-def update_led_percentage(chunk_id, total_chunks):
-    chunk_id = chunk_id + 1
-    if chunk_id > total_chunks/3: control_led(3, True)
-    if chunk_id > 2*total_chunks/3: control_led(4, True)
-    if chunk_id == total_chunks: control_led(5, True) 
+
+def main():
+    config() # Configurate switches as inputs and leds as outputs
+    while (is_master_on() == False):
+        sleep(0.1)  
+
+    state, SW = read_switches() # get switches config, decide which son to run, add logic below
+
+
+if __name__ == "__main__":
+    main()

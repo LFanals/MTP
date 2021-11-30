@@ -8,6 +8,7 @@ import sys
 # Local files imports
 import chunk_handler
 import utils
+import ioparent
 
 # nrf24 library import
 import RF24
@@ -15,9 +16,9 @@ import RF24
 
 filename = os.path.join(utils.WORKING_DIR, "received.txt")
 
-def start_receiver():
+def start_receiver(mode):
     print("Starting receiver")
-
+    set_global_config(mode)
     # Setup nrf24
     radio = setup_receiver()
 
@@ -27,53 +28,54 @@ def start_receiver():
     # Wait for Hello frame
     num_chunks = wait_hello(radio)
     
-    # At this point a positive ack has been sent
-    #ioparent.control_led(1, True)
-    #ioparent.control_led(3, True)
+    blink_led = True
+    for chunk_id in range(num_chunks):
+        # check if master switch is still ON
+        if not ioparent.is_master_on():
+            return 1
 
-    for i in range(num_chunks):
         chunk_is_good = False
+        print("\n________________________________")
+        print("Receiving chunk ", chunk_id)
         while not chunk_is_good:
-            # LEDs 3, 4 and 5 will indicate the received percentage
-            #if i > 2*num_chunks/3: 
-            #    ioparent.control_led(4, True)
-            #elif i >= num_chunks - 1:
-            #    ioparent.control_led(5, True)
-
-            chunk_data = bytearray()
+            ioparent.update_led_percentage(chunk_id, num_chunks)
+            chunk_data = bytearray() 
             # Wait for chunk_info
-            num_subchunks = wait_chunk_info(radio, i)
+            num_subchunks = wait_chunk_info(radio, chunk_id)
             
             for subchunk_id in range(num_subchunks):
                 data = wait_data_frame(radio, subchunk_id)
                 
-                if subchunk_id != 0 and subchunk_id % 50 == 0:
-                    print("Received until subchunk " + str(subchunk_id), end="\r")
+                if subchunk_id != 0 and subchunk_id % 200 == 0:
+                    print("  + Received until subchunk " + str(subchunk_id))
+                    ioparent.control_led(1, blink_led)
+                    blink_led = not blink_led
+
                 chunk_data.extend(data)
             
             chunk_is_good, decompressed_chunk = try_decompress_chunk(chunk_data)
-            wait_chunk_is_good_frame(radio, chunk_is_good, i)
+            wait_chunk_is_good_frame(radio, chunk_is_good, chunk_id)
             if not chunk_is_good:
-                print("Chunk was not good expecting to receive again chunk id: " + str(i))
+                print("Chunk was not good expecting to receive again chunk id: " + str(chunk_id))
             
         write_chunk_to_file(filename, decompressed_chunk)        
 
     radio.stopListening()
     radio.powerDown()
     print("All data has been received correctly, copying file to usb")
-    #ioparent.control_led(0, False)
-    #subprocess.call("./write_usb.sh")
+    ioparent.control_led(1, False)
+    return 0
 
 
 def setup_receiver():
     print("Setting up the NRF24 configuration")
 
-    radio = RF24.RF24(utils.SPI_SPEED)
+    radio = RF24.RF24(config.SPI_SPEED)
     radio.begin(utils.CE_PIN, utils.IRQ_PIN) #Set CE and IRQ pins
-    radio.setPALevel(utils.PA_LEVEL)
-    radio.setDataRate(utils.DATA_RATE)
-    radio.setChannel(utils.CHANNEL)
-    radio.setRetries(utils.RETRY_DELAY,utils.RETRY_COUNT)
+    radio.setPALevel(config.PA_LEVEL)
+    radio.setDataRate(config.DATA_RATE)
+    radio.setChannel(config.CHANNEL)
+    radio.setRetries(config.RETRY_DELAY,config.RETRY_COUNT)
 
     radio.enableDynamicPayloads()  
     radio.enableAckPayload()
@@ -247,5 +249,14 @@ def write_chunk_to_file(filename, chunk):
     f.close()
 
 
+def set_global_config(mode):
+    global config
+    if mode: 
+        import configMRM as config
+    else:
+        import configSR as config
+
+
 if __name__ == "__main__":
     start_receiver()
+    
