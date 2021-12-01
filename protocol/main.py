@@ -12,13 +12,14 @@ def main():
     ioparent.config()
 
     status = 1
+    ioparent.reset_leds()
+    ioparent.control_led(1, True)
     while status != 0:
         # os.system("sudo killall pigpiod")
-        # os.system("sudo pigpiod")
-        ioparent.reset_leds()
         while not ioparent.is_master_on():
             sleep(0.1)  
 
+        ioparent.control_led(1, False)
         ioparent.control_led(2, True)
         SW = ioparent.read_switches() # get switches config, decide which son to run, add logic below
         print("Master switch set to 1. Reading configuration")
