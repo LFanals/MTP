@@ -41,20 +41,21 @@ def main():
             if is_TX:
                 print("SW[1] == 1 --> Starting communcation as: SENDER")
                 status = start_sender(mode)
+                ioparent.reset_leds()
             else:
                 print("SW[1] == 0 --> Starting communcation as: RECEIVER")
                 os.system("bash " + utils.MTP_DIR + "clear_working_dir.sh")
                 status = start_receiver(mode)
+                ioparent.reset_leds()
+                ioparent.control_led(1, True)
                 os.system("bash " + utils.MTP_DIR + "write_usb.sh")
         
             if status: 
                 print("\nMANUAL INTERRUPT")
-                ioparent.reset_leds()
                 ioparent.control_led(5, True)
                 ioparent.control_led(2, True)
             else: 
                 print("\nFINISHED CORRECTLY")
-                ioparent.reset_leds()
                 ioparent.control_led(1, True)
                 ioparent.control_led(2, True)
                 
