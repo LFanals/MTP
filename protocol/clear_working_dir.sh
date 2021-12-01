@@ -1,4 +1,3 @@
 working_dir=~/working-directory
 
-rm -r ${working_dir}
-mkdir ${working_dir}
+sudo rm -rf ${working_dir}/*
