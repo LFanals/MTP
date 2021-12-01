@@ -43,16 +43,17 @@ def main():
             else:
                 print("SW[1] == 0 --> Starting communcation as: RECEIVER")
                 status = start_receiver(mode)
-                os.system("bash " + utils.MTP_DIR + "write_usb.sh")
+                # os.system("bash " + utils.MTP_DIR + "write_usb.sh")
         
-        if status: 
-            print("\nMANUAL INTERRUPT")
-            ioparent.reset_leds()
-            ioparent.control_led(5, True)
-        else: 
-            print("\nFINISHED CORRECTLY")
-            ioparent.reset_leds()
-            ioparent.control_led(1, True)
+            os.system("bash " + utils.MTP_DIR + "write_usb.sh")
+            if status: 
+                print("\nMANUAL INTERRUPT")
+                ioparent.reset_leds()
+                ioparent.control_led(5, True)
+            else: 
+                print("\nFINISHED CORRECTLY")
+                ioparent.reset_leds()
+                ioparent.control_led(1, True)
 
         sleep(0.1)
         
