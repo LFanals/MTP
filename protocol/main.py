@@ -5,6 +5,8 @@ import ioparent
 from time import sleep
 import os
 
+import utils
+
 def main():
     # os.system("sudo killall pigpiod")
     # os.system("sudo pigpiod")

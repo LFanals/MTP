@@ -19,3 +19,5 @@ sudo cp ${working_dir}/* ${usb_dir}/  # copy present files
 
 echo -e "\n Current USB device files:"
 ls ${usb_dir} # check files
+
+sudo umount ${device} # mount the device to the dedicated folder
