@@ -23,7 +23,7 @@ def start_sender(mode):
     radio = setup_sender()
 
     # Copy file from USB to working directory
-    subprocess.call("./read_usb.sh")
+    subprocess.call(utils.MTP_DIR + "read_usb.sh")
 
     # Get file from working directory
     filename = get_file_from_working_dir()
