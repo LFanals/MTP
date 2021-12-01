@@ -226,6 +226,8 @@ def set_next_ack(radio: RF24, positive, chunk_id = 0):
 
 
 def clean_working_dir():
+    if not os.path.exists(utils.WORKING_DIR):
+        os.system("mkdir " + utils.WORKING_DIR)
     try:
         os.remove(filename)
     except:
@@ -244,9 +246,12 @@ def try_decompress_chunk(chunk_data):
 
 
 def write_chunk_to_file(filename, chunk):
-    f = open(filename, "ab")
+    if not os.path.exists(utils.WORKING_DIR):
+        os.system("mkdir " + utils.WORKING_DIR)
+    f = open(filename, "ab+")
     f.write(chunk)
     f.close()
+    print("Wrote chunk to working directory")
 
 
 def set_global_config(mode):
