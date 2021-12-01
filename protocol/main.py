@@ -42,6 +42,7 @@ def main():
                 status = start_sender(mode)
             else:
                 print("SW[1] == 0 --> Starting communcation as: RECEIVER")
+                os.system("bash " + utils.MTP_DIR + "clear_working_dir.sh")
                 status = start_receiver(mode)
                 os.system("bash " + utils.MTP_DIR + "write_usb.sh")
         

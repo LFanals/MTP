@@ -7,6 +7,13 @@ working_dir=~/working-directory
 
 device=$(sudo fdisk -l | grep -o '^/dev/sd[a-z][0-9]') # identify /dev/sda1 or so as the USB device
 echo -e "USB device: ${device} \n"
+while [${device} == ""]
+do
+    device=$(sudo fdisk -l | grep -o '^/dev/sd[a-z][0-9]')
+    echo "Waiting for USB..."
+    sleep 1
+done
+
 
 echo -e "Mount USB device"
 sudo mkdir ${usb_dir} # prepare mounting directory
