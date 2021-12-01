@@ -70,6 +70,9 @@ def start_sender(mode):
         elif chunk_id + 1 != num_chunks:
             chunk_id = chunk_id + 1
             print("Chunk was good, sending next.")
+        else:
+            chunk_id = chunk_id + 1
+            print("Last chunk sent, ending TX")
 
     print("Reached end of program. In theory all data has been sent correctly")
     ioparent.control_led(1, False)
