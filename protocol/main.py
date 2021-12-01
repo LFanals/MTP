@@ -21,7 +21,7 @@ def main():
         while not ioparent.is_master_on():
             sleep(0.1)  
 
-        ioparent.reset_leds()
+        # ioparent.reset_leds()
         ioparent.control_led(1, False)
         ioparent.control_led(2, True)
         SW = ioparent.read_switches() # get switches config, decide which son to run, add logic below
