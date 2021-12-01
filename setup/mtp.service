@@ -1,0 +1,10 @@
+[Unit]
+Description=Blink my LED
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/MTP/protocol/main.py
+CPUWeight = 500
+
+[Install]
+WantedBy=multi-user.target
