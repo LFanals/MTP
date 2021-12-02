@@ -22,3 +22,4 @@ CHUNK_IS_GOOD_TYPE = 3
 
 # Others
 WORKING_DIR = expanduser("~") + "/working-directory"
+MTP_DIR = "/home/pi/MTP/protocol/"

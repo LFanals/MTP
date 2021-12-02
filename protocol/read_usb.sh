@@ -17,6 +17,7 @@ echo -e "\n USB device files:"
 ls ${usb_dir} # check usb files
 
 echo -e "\n Copy files USB device -> working directory"
+rm -r ${working_dir}
 mkdir ${working_dir}
 cp ${usb_dir}/* ${working_dir}/ # copy present files 
 

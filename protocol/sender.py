@@ -23,7 +23,7 @@ def start_sender(mode):
     radio = setup_sender()
 
     # Copy file from USB to working directory
-    subprocess.call("./read_usb.sh")
+    subprocess.call(utils.MTP_DIR + "read_usb.sh")
 
     # Get file from working directory
     filename = get_file_from_working_dir()
@@ -70,6 +70,9 @@ def start_sender(mode):
         elif chunk_id + 1 != num_chunks:
             chunk_id = chunk_id + 1
             print("Chunk was good, sending next.")
+        else:
+            chunk_id = chunk_id + 1
+            print("Last chunk sent, ending TX")
 
     print("Reached end of program. In theory all data has been sent correctly")
     ioparent.control_led(1, False)

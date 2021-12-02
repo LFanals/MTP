@@ -1,0 +1,12 @@
+Follow https://learn.sparkfun.com/tutorials/how-to-run-a-raspberry-pi-program-on-startup/all
+
+Copy the mtp.service file at
+
+/lib/systemd/system/mtp.service
+
+Then,
+
+sudo systemctl daemon-reload
+sudo systemctl enable mtp.service
+
+
