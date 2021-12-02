@@ -22,8 +22,9 @@ def start_sender(mode):
     # Setup nrf24 sender
     radio = setup_sender()
 
-    # Copy file from USB to working directory
-    subprocess.call(utils.MTP_DIR + "read_usb.sh")
+    # Check if USB has been read, if not read it
+    if not working_directory_contains_file():
+        subprocess.call(utils.MTP_DIR + "read_usb.sh")
 
     # Get file from working directory
     filename = get_file_from_working_dir()
@@ -82,19 +83,6 @@ def start_sender(mode):
 
 
 
-def get_file_from_working_dir() -> str:
-
-    # Get list of files in working directory
-    files = [f for f in os.listdir(utils.WORKING_DIR) if os.path.isfile(os.path.join(utils.WORKING_DIR, f))]
-
-    # We will send only one file
-    if len(files) == 0:
-        print("No files found in the working directory. Aborting...")
-        sys.exit()
-    filename = os.path.join(utils.WORKING_DIR, files[0])
-
-    print("File to send: " + filename)
-    return filename
 
 def setup_sender():
 
@@ -199,6 +187,28 @@ def set_global_config(mode):
     else:
         import configSR as config
 
+def working_directory_contains_file():
+    # If there is one or more files in working directory returns False
+    if len(get_all_working_directory_files()) == 0:
+        return False
+    return True
+
+def get_file_from_working_dir() -> str:
+
+    # Get list of files in working directory
+    files = get_all_working_directory_files()
+
+    # We will send only one file
+    if len(files) == 0:
+        print("No files found in the working directory. Aborting...")
+        sys.exit()
+    filename = os.path.join(utils.WORKING_DIR, files[0])
+
+    print("File to send: " + filename)
+    return filename
+
+def get_all_working_directory_files():
+    return [f for f in os.listdir(utils.WORKING_DIR) if os.path.isfile(os.path.join(utils.WORKING_DIR, f))]
 
 if __name__ == "__main__":
     start_sender(10)

@@ -25,6 +25,12 @@ SW3 = 11
 SW4 = 7
 SW5 = 5
 
+# Switches functionality
+MASTER_SWITCH = 0
+TX_RX_SWITCH = 1
+USB_SWITCH = 2 
+NM_MODE_SWITCH = 3 
+CONFIG_SWITCH = 4
 
 def config():
     # Config
@@ -68,11 +74,20 @@ def is_master_on():
     # Returns boolean to indicate SW1 state
     SW = read_switches()
 
-    if SW[0] == 1:
+    if SW[MASTER_SWITCH] == 1:
         return True
     else:
         return False
+
+def is_usb_switch_on():
+    # Returns True if the usb switch is on
             
+    SW = read_switches()
+    if SW[USB_SWITCH] == 1:
+        return True
+    else:
+        return False
+
 
 def control_led(led: int, state: bool):
     # Control led number with a boolean: True = led on

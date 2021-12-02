@@ -1,15 +1,14 @@
-import sys
+from protocol.ioparent import is_usb_switch_on
 from receiver import start_receiver
 from sender import start_sender
 import ioparent
 from time import sleep
 import os
+import subprocess
 
 import utils
 
 def main():
-    # os.system("sudo killall pigpiod")
-    # os.system("sudo pigpiod")
     # Get transmitter or receiver arguments
     ioparent.config()
 
@@ -17,18 +16,24 @@ def main():
     ioparent.reset_leds()
     ioparent.control_led(1, True)
     while status != 0:
-        # os.system("sudo killall pigpiod")
+
+        is_usb_read = False 
         while not ioparent.is_master_on():
+            if not is_usb_read and ioparent.is_usb_switch_on():
+                subprocess.call(utils.MTP_DIR + "read_usb.sh")
+                is_usb_read = True
+                ioparent.control_led(5, True)
             sleep(0.1)  
 
         ioparent.reset_leds()
         ioparent.control_led(1, False)
         ioparent.control_led(2, True)
+        ioparent.control_led(5, False)
         SW = ioparent.read_switches() # get switches config, decide which son to run, add logic below
         print("Master switch set to 1. Reading configuration")
-        is_TX = SW[1]
-        is_NM = SW[2]
-        mode = SW[3]
+        is_TX = SW[ioparent.TX_RX_SWITCH]
+        is_NM = SW[ioparent.NM_MODE_SWITCH]
+        mode = SW[ioparent.CONFIG_SWITCH]
 
         if is_NM: 
             print("SW[2] == 1 --> Mode: NM")
