@@ -16,6 +16,7 @@ done
 
 
 echo -e "Mount USB device"
+sudo rm -r ${usb_dir}
 sudo mkdir ${usb_dir} # prepare mounting directory
 sudo chmod 777 ${usb_dir} # assign full permissions
 sudo mount ${device} ${usb_dir} # mount the device to the dedicated folder
