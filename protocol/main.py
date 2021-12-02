@@ -1,4 +1,3 @@
-from protocol.ioparent import TX_RX_SWITCH
 from receiver import start_receiver
 from sender import start_sender, working_directory_contains_file
 import ioparent
