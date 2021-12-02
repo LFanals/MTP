@@ -1,5 +1,6 @@
+from protocol.ioparent import TX_RX_SWITCH
 from receiver import start_receiver
-from sender import start_sender
+from sender import start_sender, working_directory_contains_file
 import ioparent
 from time import sleep
 import os
@@ -20,8 +21,9 @@ def main():
         while not ioparent.is_master_on():
             if not is_usb_read and ioparent.is_usb_switch_on():
                 os.system("sudo bash " + utils.MTP_DIR + "read_usb.sh")
-                is_usb_read = True
-                ioparent.control_led(5, True)
+                if working_directory_contains_file():   
+                    is_usb_read = True
+                    ioparent.control_led(5, True)
             sleep(0.1)  
 
         ioparent.reset_leds()
@@ -43,6 +45,9 @@ def main():
             else: print("SW[3] == 0 --> Mode: SR")
 
             if is_TX:
+                while not working_directory_contains_file():
+                    os.system("sudo bash " + utils.MTP_DIR + "read_usb.sh")
+        
                 print("SW[1] == 1 --> Starting communcation as: SENDER")
                 status = start_sender(mode)
                 ioparent.reset_leds()

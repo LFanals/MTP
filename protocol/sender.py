@@ -22,10 +22,6 @@ def start_sender(mode):
     # Setup nrf24 sender
     radio = setup_sender()
 
-    # Check if USB has been read, if not read it
-    if not working_directory_contains_file():
-        os.system("sudo bash " + utils.MTP_DIR + "read_usb.sh")
-
     # Get file from working directory
     filename = get_file_from_working_dir()
 
