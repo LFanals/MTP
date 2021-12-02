@@ -24,7 +24,7 @@ def start_sender(mode):
 
     # Check if USB has been read, if not read it
     if not working_directory_contains_file():
-        subprocess.call(utils.MTP_DIR + "read_usb.sh")
+        os.system("sudo bash " + utils.MTP_DIR + "read_usb.sh")
 
     # Get file from working directory
     filename = get_file_from_working_dir()
@@ -190,6 +190,9 @@ def set_global_config(mode):
 
 def working_directory_contains_file():
     # If there is one or more files in working directory returns False
+    for file in get_all_working_directory_files():
+        print(file)
+
     if len(get_all_working_directory_files()) == 0:
         return False
     return True
