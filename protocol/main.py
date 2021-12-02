@@ -1,4 +1,3 @@
-from protocol.ioparent import is_usb_switch_on
 from receiver import start_receiver
 from sender import start_sender
 import ioparent
