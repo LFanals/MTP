@@ -9,7 +9,7 @@ device=$(sudo fdisk -l | grep -o '^/dev/sd[a-z][0-9]') # identify /dev/sda1 or s
 echo -e "Device: ${device} \n"
 
 echo -e "Mount USB device"
-sudo rm -r ${usb_dir}
+#sudo rm -r ${usb_dir}
 sudo mkdir ${usb_dir} # prepare mounting directory
 sudo chmod 777 ${usb_dir} # assign full permissions
 sudo mount ${device} ${usb_dir} # mount the device to the dedicated folder
