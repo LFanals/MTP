@@ -213,7 +213,7 @@ def get_all_working_directory_files():
 
 
 def print_compressed_size(chunks):
-    f = open("compressed.bin", "wb+")
+    f = open("compressed.bin", "ab+")
     total = 0
     for chunk in chunks:
         f.write(chunk)
