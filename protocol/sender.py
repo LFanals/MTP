@@ -31,6 +31,7 @@ def start_sender(mode):
 
     # Get file chunks
     chunks = chunk_handler.get_file_chunks(filename, config.CHUNKS_SIZE, config.COMPRESSION_LEVEL)
+    print_compressed_size(chunks)
     subchunks = packet_creator.create_data_frames(chunks)
 
     # Send Hello frame
@@ -209,6 +210,14 @@ def get_file_from_working_dir() -> str:
 
 def get_all_working_directory_files():
     return [f for f in os.listdir(utils.WORKING_DIR) if os.path.isfile(os.path.join(utils.WORKING_DIR, f))]
+
+
+def print_compressed_size(chunks):
+    total = 0
+    for chunk in chunks:
+        total = total + len(chunk)
+    total = total / 1000
+    print("Size of compressed file is :" + total + "KB")
 
 if __name__ == "__main__":
     start_sender(10)
