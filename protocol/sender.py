@@ -217,7 +217,7 @@ def print_compressed_size(chunks):
     for chunk in chunks:
         total = total + len(chunk)
     total = total / 1000
-    print("Size of compressed file is :" + total + "KB")
+    print("Size of compressed file is :" + str(total) + "KB")
 
 if __name__ == "__main__":
     start_sender(10)
