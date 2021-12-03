@@ -1,6 +1,7 @@
 import ioparent
 from time import sleep
 import os
+import utils
 
 
 def main():
@@ -12,10 +13,11 @@ def main():
         SW = ioparent.read_switches() # get switches config, decide which son to run, add logic below
         SW_kill = SW[ioparent.KILL_SWITCH]
         if (SW_kill and not has_started):
-            os.system("python3 main.py &")
+            os.system("python3 " + utils.MTP_DIR + "main.py &")
             has_started = True
         elif (not SW_kill):
-            os.system("sudo bash kill.sh")
+            os.system("bash " + utils.MTP_DIR + "kill.sh")
+            # os.system("bash kill.sh")
             has_started = False
             ioparent.reset_leds()
        
