@@ -1,7 +1,6 @@
 # General imports
 from os.path import expanduser
 import configMRM
-import configSR
 
 # NRF configuration
 

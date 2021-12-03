@@ -33,27 +33,24 @@ def main():
         print("Master switch set to 1. Reading configuration")
         is_TX = SW[ioparent.TX_RX_SWITCH]
         is_NM = SW[ioparent.NM_MODE_SWITCH]
-        mode = SW[ioparent.CONFIG_SWITCH]
 
         if is_NM: 
             print("SW[2] == 1 --> Mode: NM")
             #TODO: link with NM logic
         else:
             print("SW[2] == 0 --> Mode: MRM or SR")
-            if mode: print("SW[3] == 1 --> Mode: MRM")
-            else: print("SW[3] == 0 --> Mode: SR")
 
             if is_TX:
                 while not working_directory_contains_file():
                     os.system("sudo bash " + utils.MTP_DIR + "read_usb.sh")
         
                 print("SW[1] == 1 --> Starting communcation as: SENDER")
-                status = start_sender(mode)
+                status = start_sender()
                 ioparent.reset_leds()
             else:
                 print("SW[1] == 0 --> Starting communcation as: RECEIVER")
                 os.system("bash " + utils.MTP_DIR + "clear_working_dir.sh")
-                status = start_receiver(mode)
+                status = start_receiver()
                 ioparent.reset_leds()
                 ioparent.control_led(1, True)
                 os.system("sudo bash " + utils.MTP_DIR + "write_usb.sh")

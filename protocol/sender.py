@@ -14,10 +14,10 @@ import ioparent
 # nrf24 library import
 import RF24
 
-def start_sender(mode):
+def start_sender():
     print("Starting sender")
     time_start = time.time()
-    set_global_config(mode)
+    set_global_config()
 
     # Setup nrf24 sender
     radio = setup_sender()
@@ -177,12 +177,9 @@ def send(radio, payload):
         return (False, -1)
 
 
-def set_global_config(mode):
+def set_global_config():
     global config
-    if mode: 
-        import configMRM as config
-    else:
-        import configSR as config
+    import configMRM as config
 
 def working_directory_contains_file():
     # If there is one or more files in working directory returns False

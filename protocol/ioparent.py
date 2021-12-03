@@ -30,7 +30,7 @@ MASTER_SWITCH = 0
 TX_RX_SWITCH = 1
 USB_SWITCH = 2 
 NM_MODE_SWITCH = 3 
-CONFIG_SWITCH = 4
+KILL_SWITCH = 4
 
 def config():
     # Config
