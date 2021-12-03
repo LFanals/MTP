@@ -254,12 +254,9 @@ def write_chunk_to_file(filename, chunk):
     print("Wrote chunk to working directory")
 
 
-def set_global_config(mode):
+def set_global_config():
     global config
-    if mode: 
-        import configMRM as config
-    else:
-        import configSR as config
+    import configMRM as config
 
 
 if __name__ == "__main__":
