@@ -16,9 +16,9 @@ import RF24
 
 filename = os.path.join(utils.WORKING_DIR, "received.txt")
 
-def start_receiver(mode):
+def start_receiver():
     print("Starting receiver")
-    set_global_config(mode)
+    set_global_config()
     # Setup nrf24
     radio = setup_receiver()
 
