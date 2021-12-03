@@ -55,7 +55,7 @@ def start_sender():
         for subchunk in subchunks[chunk_id]:
             send_subchunk(radio, subchunk)
             count = count + 1
-            if count !=0 and count % 200 == 0: 
+            if count !=0 and count % 50 == 0: 
                 print("  + Sent until subchunk " + str(count))
                 ioparent.control_led(1, blink_led)
                 blink_led = not blink_led
