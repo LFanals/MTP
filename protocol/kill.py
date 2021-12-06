@@ -27,6 +27,7 @@ def main():
         elif not SW_master and not SW_network and not SW_tx and has_started:
             # We stop the receiver and wait until we are able to write to usb
             ioparent.reset_leds()
+            has_started = False
             os.system("bash " + utils.MTP_DIR + "kill.sh")
             ioparent.control_led(1, True)
             os.system("bash " + utils.MTP_DIR + "write_usb.sh")
