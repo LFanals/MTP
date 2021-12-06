@@ -31,8 +31,8 @@ def start_receiver():
     blink_led = True
     for chunk_id in range(num_chunks):
         # check if master switch is still ON
-        if not ioparent.is_master_on():
-            return 1
+        #if not ioparent.is_master_on():
+        #   return 1
 
         chunk_is_good = False
         print("\n________________________________")
