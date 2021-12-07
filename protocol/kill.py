@@ -7,6 +7,7 @@ import utils
 def main():
 
     has_started = False
+    has_received = False
     ioparent.config()
     while True:
 
@@ -19,18 +20,21 @@ def main():
         if SW_kill and not has_started:
             os.system("python3 " + utils.MTP_DIR + "main.py &")
             has_started = True
-        elif not SW_kill:
+            has_received = True
+        if not SW_kill and has_started:
             os.system("bash " + utils.MTP_DIR + "kill.sh")
             has_started = False
             ioparent.reset_leds()
 
-        elif not SW_master and not SW_network and not SW_tx and has_started:
+        if not SW_kill and not SW_master and not SW_network and not SW_tx and has_received:
             # We stop the receiver and wait until we are able to write to usb
             ioparent.reset_leds()
-            has_started = False
+            has_received = False
             os.system("bash " + utils.MTP_DIR + "kill.sh")
             ioparent.control_led(1, True)
+            ioparent.control_led(5, True)
             os.system("bash " + utils.MTP_DIR + "write_usb.sh")
+            ioparent.control_led(5, False)
             ioparent.control_led(2, True)
        
         sleep(0.1) 
