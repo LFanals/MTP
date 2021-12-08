@@ -9,6 +9,7 @@ import utils
 
 def main():
     # Get transmitter or receiver arguments
+    os.system("sudo rm -r " + utils.WORKING_DIR)
     ioparent.config()
 
     status = 1
