@@ -16,6 +16,9 @@ def main():
     ioparent.reset_leds()
     ioparent.control_led(1, True)
     while status != 0:
+        SW = ioparent.read_switches()
+        is_TX = SW[ioparent.TX_RX_SWITCH]
+        is_NM = SW[ioparent.NM_MODE_SWITCH]
 
         while ioparent.is_master_on():
             sleep(0.5)  
@@ -25,7 +28,9 @@ def main():
 
         is_usb_read = False 
         while not ioparent.is_master_on():
-            if not is_usb_read:
+            SW = ioparent.read_switches()
+            is_TX = SW[ioparent.TX_RX_SWITCH]
+            if not is_usb_read and is_TX:
                 os.system("bash " + utils.MTP_DIR + "read_usb.sh")
                 if working_directory_contains_file():   
                     is_usb_read = True
@@ -36,9 +41,8 @@ def main():
         ioparent.control_led(1, False)
         ioparent.control_led(2, True)
         ioparent.control_led(5, False)
-        SW = ioparent.read_switches() # get switches config, decide which son to run, add logic below
-        print("Master switch set to 1. Reading configuration")
-        is_TX = SW[ioparent.TX_RX_SWITCH]
+        
+        SW = ioparent.read_switches()
         is_NM = SW[ioparent.NM_MODE_SWITCH]
 
         if is_NM: 
