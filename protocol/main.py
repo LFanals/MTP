@@ -46,6 +46,7 @@ def main():
             print("SW[3] == 1 --> Mode: NM")
             #TODO: link with NM logic
             os.system("python3 " + utils.NM_TOP)
+            ioparent.control_led(3, True)
         else:
             print("SW[3] == 0 --> Mode: MRM or SR")
 
