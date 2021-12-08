@@ -32,9 +32,9 @@ def main():
             has_received = False
             os.system("bash " + utils.MTP_DIR + "kill.sh")
             ioparent.control_led(1, True)
-            ioparent.control_led(5, True)
+            ioparent.control_led(4, True)
             os.system("bash " + utils.MTP_DIR + "write_usb.sh")
-            ioparent.control_led(5, False)
+            ioparent.control_led(4, False)
             ioparent.control_led(2, True)
        
         sleep(0.1) 
