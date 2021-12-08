@@ -3,7 +3,7 @@ Description=Blink my LED
 After=multi-user.target
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/MTP/protocol/main.py
+ExecStart=/usr/bin/python3 /home/pi/MTP/protocol/kill.py
 CPUWeight = 500
 User=root
 

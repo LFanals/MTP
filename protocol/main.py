@@ -35,10 +35,11 @@ def main():
         is_NM = SW[ioparent.NM_MODE_SWITCH]
 
         if is_NM: 
-            print("SW[2] == 1 --> Mode: NM")
+            print("SW[3] == 1 --> Mode: NM")
             #TODO: link with NM logic
+            os.system("python3 " + utils.NM_TOP)
         else:
-            print("SW[2] == 0 --> Mode: MRM or SR")
+            print("SW[3] == 0 --> Mode: MRM or SR")
 
             if is_TX:
                 while not working_directory_contains_file():
