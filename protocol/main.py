@@ -14,7 +14,14 @@ def main():
     status = 1
     ioparent.reset_leds()
     ioparent.control_led(1, True)
+    led_active = True
     while status != 0:
+
+        while ioparent.is_master_on():
+            sleep(0.5)  
+            ioparent.control_led(3, led_active)
+            led_active = not led_active
+        ioparent.control_led(3, False)
 
         is_usb_read = False 
         while not ioparent.is_master_on():
