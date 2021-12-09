@@ -2,7 +2,7 @@
 
 # Definitions
 usb_dir=/media/usb
-working_dir=~/working-directory
+working_dir=/home/pi/working-directory
 
 
 device=$(sudo fdisk -l | grep -o '^/dev/sd[a-z][0-9]') # identify /dev/sda1 or so as the USB device
